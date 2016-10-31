@@ -1,0 +1,83 @@
+
+Metaphor
+-Sculpture sits in a room, multiple people walk into the room over time, all
+of them altering it in different ways
+-In the FP world, the person would take the existing sculpture, perform their
+transformation, and then hand it directly to the next person who wanted to use
+it.
+  
+
+Immutability
+  - Less confusion
+  - Easier refactoring
+  - Statements that are true, are true forever.
+    "If things aren't equal forever, were they ever really equall?"
+  - Builder pattern to demonstrate immutable transformations over mutations
+
+Passing functions as arguments
+  -Show similar nested loops in functions, and then show
+
+Functional Error Handling
+  -Exceptions are fine, throwing excepts is not.
+
+// TODO Use Try's/Either's here
+  val myList = List(Some(5), None, Some(3), None, Some(3)) 
+  val (successes, failures) = myList.partition(x=>x.isDefined)
+
+// Research Example
+  val researchTopics = List("Functional Programming", "Object-Oriented Programming", "Imperative Programming", "Dynamic Programming")
+  def searchWikipedia(searchTerm: String): Option[HTMLContent]
+  def pageSections(content: HTMLContent): List[String]
+  def importantRelatedTerms(content: HTMLContent): List[String]
+  def linksToTopic(searchTerm: String): List[URL]
+  // Only proceed to SO step if there was a Wikipedia entry.
+  // TODO Search Stack Overflow for terms
+    - Number of questions asked
+    - Ratio of answered to unanswered
+    Document doc = Jsoup.connect("http://en.wikipedia.org/wiki/Boston").get();
+    Element contentDiv = doc.select("div[id=content]").first();
+    contentDiv.toString(); // The result
+
+// Image manipulation example
+classpath.add("com.sksamuel.scrimage" %% "scrimage-core" % "2.1.0")
+classpath.add("com.sksamuel.scrimage" %% "scrimage-io-extra" % "2.1.0")
+classpath.add("com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.0")
+- Get all images in directory
+- Scale them to consistent size
+- Pad them with Demotivational-style border
+val inFile = ... // input File
+val outFile = ... // output File
+// Image.fromFile(inFile).filter(BlurFilter).flipX.output(outFile)(JpegWriter())
+Image.fromFile(inFile).scale(/*scale dimensions*/).pad(/*pad dimensions*/).output(outFile)(JpegWriter())
+  - Possible effects to show off:
+    - diffuse
+    - edge
+    - lens flare
+    - oil
+    - pixelate
+    - ripple
+    - twirl
+    - vintage
+  - Generate some sudo-random composite images
+  - Maybe add a signature of some type to the meta data?
+
+Git as a functional data structure
+  - Hash's ensure that nothing is tweaked later
+  - Can operate on every commit concurrently
+  - BFG example (aka project Identity Theft
+    - Remove Linus from entire project history?
+    - "Linus" -> "Bill"
+    - "Torvalds" -> "Frasure"
+    - "ltorvalds@linux.com" -> "bill.frasure@gmail.com"
+
+Fun/Important Scala Projects
+- ScalaFiddle
+- ScalaJS
+- ScalaTags
+- ScalaCSS
+- Ammonite
+- ScalaTest
+- ScalaZ (?)
+- Cats (?)
+- ScalaMeta (?)
+
