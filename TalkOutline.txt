@@ -1,17 +1,37 @@
 
-Metaphor
--Sculpture sits in a room, multiple people walk into the room over time, all
-of them altering it in different ways
--In the FP world, the person would take the existing sculpture, perform their
-transformation, and then hand it directly to the next person who wanted to use
-it.
+Sculpture Metaphor
+  Sculpture volatileSculpture = new MutableSculpture(Materials.Clay, Colors.Red, Status.Unshaped)
+
+  -Sculpture sits in a room, multiple people walk into the room over time, all
+  of them altering it in different ways
+    -You might try to anchor something to a piece of the sculpture that somebody
+    just removed
+      volatileSculpture.removeHandles()
+      volatileSculpture.polishHandles()
+    -When the sculpture was created, it was red, but when you try to add blue
+    detailing, you end up drawing blue designs on a blue sculpture.
+      volatileSculpture.setColor(Colors.Blue)
+      volatileSculpture.addDetailing(/* Vectors for designs */, Colors.Blue)
+      
+    -It's possible that someone removed the sculpture entirely
+      -volatileSculpture = null
+      -volatileSculpture.display() // NPE!
+
+  -In the FP world, the person would take the existing sculpture, perform their
+  transformation, and then hand it directly to the next person who wanted to use
+  it.
+    val solidSculpture = new ImmutableSculpture(Materials.Clay, Colors.Red, Status.Unshaped)
+    solidSculpture.removeHandles() // Makes new version, then loses it.  Effectively does nothing.
+    val sculptureWithNoHandles = solidSculpture.removeHandles()
+    solidSculpture.polishHandles() // Works as expected
+    sculptureWithNoHandles.polishHandles()  // Obviously incorrect
   
 
 Immutability
   - Less confusion
   - Easier refactoring
   - Statements that are true, are true forever.
-    "If things aren't equal forever, were they ever really equall?"
+    "If things aren't equal forever, were they ever really equal?"
   - Builder pattern to demonstrate immutable transformations over mutations
 
 Passing functions as arguments
