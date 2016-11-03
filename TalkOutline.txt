@@ -26,16 +26,46 @@ Sculpture Metaphor
     solidSculpture.polishHandles() // Works as expected
     sculptureWithNoHandles.polishHandles()  // Obviously incorrect
   
-
 Immutability
   - Less confusion
   - Easier refactoring
   - Statements that are true, are true forever.
-    "If things aren't equal forever, were they ever really equal?"
+      "If things aren't equal forever, were they ever really equal?"
+    At most, you can say they happened to be equal at a given instant.
+    
+
+
   - Builder pattern to demonstrate immutable transformations over mutations
+  - Prevent this errors:
+      if (n = 0)
+
+
+Unit
+  Unit doesn't mean:
+    This function has an unhelpful return type.
+  It means:
+    "This function has a side effect."
+    or
+    "This crosses the boundary into the real world."
+  Otherwise, there would be no point in executing it!
+
+  Ponder: Why is it okay to have return types in DAO functions?
+    I suppose it's because that's the closest you can get to the precipice.
+    Internal functions should be the only ones that return Unit, unless you want
+    to give full low-level capabilities. Often, you won't.
+  
 
 Passing functions as arguments
   -Show similar nested loops in functions, and then show
+
+Iteration vs map
+  - Demo a few contrived data structures
+    - 4 section square
+    - Circular List
+    - 3D matrix (MRI data, Videogame Environment, 
+    - Multiple Lists (Supermarket Checkout Area, Queue Manager)
+
+
 
 Functional Error Handling
   -Exceptions are fine, throwing excepts is not.
@@ -54,9 +84,6 @@ Functional Error Handling
   // TODO Search Stack Overflow for terms
     - Number of questions asked
     - Ratio of answered to unanswered
-    Document doc = Jsoup.connect("http://en.wikipedia.org/wiki/Boston").get();
-    Element contentDiv = doc.select("div[id=content]").first();
-    contentDiv.toString(); // The result
 
 // Image manipulation example
 classpath.add("com.sksamuel.scrimage" %% "scrimage-core" % "2.1.0")
@@ -68,6 +95,12 @@ classpath.add("com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.0")
 val inFile = ... // input File
 val outFile = ... // output File
 // Image.fromFile(inFile).filter(BlurFilter).flipX.output(outFile)(JpegWriter())
+
+-Very nice "in the wild" use of foldLeft here:
+  def filter(filters: Filter*): Image = {
+    filters.foldLeft(this)((image, filter) => image.filter(filter))
+  }
+
 Image.fromFile(inFile).scale(/*scale dimensions*/).pad(/*pad dimensions*/).output(outFile)(JpegWriter())
   - Possible effects to show off:
     - diffuse
@@ -80,8 +113,19 @@ Image.fromFile(inFile).scale(/*scale dimensions*/).pad(/*pad dimensions*/).outpu
     - vintage
   - Generate some sudo-random composite images
   - Maybe add a signature of some type to the meta data?
+  - Incorperate a random effect. See if anyone notices, then point out that
+    it's a subtle interaction with the real work, via system clock.
+    - To be pure, a timestamp must be provided in the function interface.
 
 Git as a functional data structure
+  - Immutability doesn't just facilitate concurrent software operations, it
+    also works for software developers.
+  - Don't waste *any* time arguing about what happened to the code base at any
+    given point.
+  - Every change is recorded as part of persistent data structure
+  - This structure is *completely* reproducable at any moment
+  - Adding a new root node to the tree is cheap and efficient, so common commit and
+    branching commands are *fast*.
   - Hash's ensure that nothing is tweaked later
   - Can operate on every commit concurrently
   - BFG example (aka project Identity Theft
@@ -101,3 +145,5 @@ Fun/Important Scala Projects
 - Cats (?)
 - ScalaMeta (?)
 
+Fun/Important FP Projects
+- Haskell type-based search engine
