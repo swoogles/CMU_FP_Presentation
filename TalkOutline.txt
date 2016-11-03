@@ -1,3 +1,28 @@
+How to start living and loving the fantasy world of software
+-The real world has so many flaws:
+  - Decay
+  - Malfunction
+  - Natural Disasters
+  - Human treachery
+  - Human incompetence
+- By interacting with it only when absolutely necessary, we can experience
+  undreamed-of consistency.
+- We need only trust that the laws of nature (components of the processor) are
+  functioning properly in order to have complete confidence in our universe.
+
+You can actually get the perfect assassin in this world.
+Version of mutation
+  void mutator -> "This guy says he murdered the target."
+  int mutator -> "This guy says he murdered the target, and that it took 3 stabs to finish the job.
+  new version -> "This guy says he murdered the target and then he mailed us the body with 3 stab wounds in it."
+  Which version do you trust to get the job done?
+  
+  kill(Target): Unit // *Stairs at you silently*
+  kill(Target): String // "Alright, I'll kill him."
+  kill(Target): Int // Indicate number of bullets.
+  kill(Target): Target // Return the actual body.
+  kill(Target): Picture[Target] // For when the target is too large to send back
+
 
 Sculpture Metaphor
   Sculpture volatileSculpture = new MutableSculpture(Materials.Clay, Colors.Red, Status.Unshaped)
