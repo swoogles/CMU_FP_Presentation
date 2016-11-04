@@ -23,6 +23,11 @@ Version of mutation
   kill(Target): Target // Return the actual body.
   kill(Target): Picture[Target] // For when the target is too large to send back
 
+Possible items to construct/manipulate:
+  -Sculpture
+  -Bicycle
+  -Car
+  -
 
 Sculpture Metaphor
   Sculpture volatileSculpture = new MutableSculpture(Materials.Clay, Colors.Red, Status.Unshaped)
