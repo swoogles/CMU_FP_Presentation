@@ -27,7 +27,57 @@ Possible items to construct/manipulate:
   -Sculpture
   -Bicycle
   -Car
-  -
+  -Messaging System
+  -Routing System
+    -Destination algorithm
+    -Queue size
+    -Packet encoding
+    -
+
+Imagine that you and your brother share a car.
+sealed trait Condition
+object Pristine extends Condition
+object Decent extends Condition
+object Trashed extends Condition
+
+sealed trait Location
+object School extends Location
+object Home extends Location
+object Restaurant extends Location
+object JanesHouse extends Location
+
+class Car(fuel: Int, condition: Condition, location: Location)
+class Person(name: String, location: Location) {
+  def drive(car: Car, destination: Location) = ???
+  def clean(car: Car) = ???
+}
+
+
+var sam = Person("Sam", Home)
+var joe = Person("Joe", School)
+var mutableCar = Car(100, Pristine, Home)
+
+joe.drive(mutableCar, School) // Error: Joe can't drive a car if he's not in the same location
+
+if (mutableCar.location == Home) // Now we're safe. Sort've.
+  sam.drive(mutableCar, School)
+
+
+if (mutableCar.condition != Pristine)
+  joe.clean(mutableCar)
+joe.drive(mutableCar, JanesHouse)
+
+if (mutableCar.fuel < 50)
+  joe.fill(mutableCar)
+sam.drive(mutableCar, Restaurant)
+sam.drive(mutableCar, School)
+sam.drive(mutableCar, Home)
+joe.drive(mutableCar, school) // Error: Out of gas!
+
+case class Car(fuel: Int, condition: Condition, location: Location)
+
+
+
 
 Sculpture Metaphor
   Sculpture volatileSculpture = new MutableSculpture(Materials.Clay, Colors.Red, Status.Unshaped)
