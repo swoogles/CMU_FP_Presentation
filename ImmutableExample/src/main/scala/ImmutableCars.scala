@@ -1,4 +1,4 @@
-package com.bfrasure.fp.cmu
+package com.bfrasure.fp.cmu.immutable
 
 import scala.util.{Failure, Success, Try}
 
