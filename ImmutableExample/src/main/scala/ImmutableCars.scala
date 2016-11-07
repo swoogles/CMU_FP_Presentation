@@ -23,7 +23,6 @@ object Car {
     } else {
       Failure(new Exception("Ran out of gas!"))
     }
-
   }
 }
 case class Person(name: String, location: Location)
@@ -52,11 +51,9 @@ object Person {
 }
 
 case class Intentions(joe: Location, sam: Location)
-case class IntentionsAlt(joe: Person, sam: Person) // Rather than giving destinations, you can request a precise end state.
 
 object Scenarios {
   def updateScene(joe: Person, sam: Person, car: Car, intentions: Intentions): Try[(Person, Person, Car)] = {
-    // driveTry(person: Person, car: Car, destination: Location): Try[(Person, Car)] = {
     for ((newJoe, newCar) <- Person.drive(joe, car, intentions.joe);
          (newSam, finalCar) <- Person.drive(sam, newCar, intentions.sam) ) yield {
       (newJoe, newSam, finalCar)
