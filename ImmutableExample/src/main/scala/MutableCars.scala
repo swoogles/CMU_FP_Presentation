@@ -11,7 +11,7 @@ object Home extends Location
 object Restaurant extends Location
 object JanesHouse extends Location
 
-case class Car(var fuel: Int, var condition: Condition, var location: Location) {
+case class Car(var fuel: Int, var location: Location) {
   val tripCost = 20
   def drive(destination: Location): Unit = {
     if (this.fuel <= 0)
@@ -31,8 +31,6 @@ case class Person(var name: String, var location: Location) {
     car.drive(destination)
     this.location = destination
   }
-  def clean(car: Car): Unit =
-    car.condition = Pristine
 
   def fill(car: Car): Unit =
     car.fuel = 100
@@ -46,6 +44,6 @@ case class Person(var name: String, var location: Location) {
     def resetVars(): Unit = {
       sam = Person("Sam", Home)
       joe = Person("Joe", Home)
-      mutableCar = Car(100, Pristine, Home)
+      mutableCar = Car(100, Home)
     }
   }

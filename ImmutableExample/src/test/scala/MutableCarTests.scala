@@ -6,7 +6,7 @@ class MutableCarTests extends FlatSpec {
 
   var sam = Person("Sam", Home)
   var joe = Person("Joe", Home)
-  var car = Car(100, Pristine, Home)
+  var car = Car(100, Home)
 
   "Driving" should "not be possible if you aren't with the car" in {
     assert(1==1)

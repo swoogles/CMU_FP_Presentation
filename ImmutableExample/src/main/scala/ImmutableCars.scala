@@ -13,7 +13,7 @@ case object Home extends Location
 case object Restaurant extends Location
 case object JanesHouse extends Location
 
-case class Car(fuel: Int, condition: Condition, location: Location)
+case class Car(fuel: Int, location: Location)
 object Car {
   val tripCost = 20
 
@@ -21,7 +21,7 @@ object Car {
     if (car.location == destination) {
       Success(car)
     } else if (car.fuel > tripCost) {
-      Success(Car(car.fuel - tripCost, car.condition, destination))
+      Success(Car(car.fuel - tripCost, destination))
     } else {
       Failure(new Exception("Ran out of gas!"))
     }
@@ -46,8 +46,6 @@ object Person {
 
   // TODO: Make person parameter relevant in some way.
   //       Possibly just accept that it doesn't have a software need here.
-  def clean(person: Person, car: Car): Car =
-  car.copy(condition = Pristine)
   def fill(person: Person, car: Car): Car =
     car.copy(fuel = 100)
 }

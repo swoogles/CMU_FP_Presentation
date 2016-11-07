@@ -6,7 +6,7 @@ class ImmutableCarTests extends FlatSpec {
 
   val SAM = Person("Sam", Home)
   val JOE = Person("Joe", Home)
-  val CAR = Car(100, Pristine, Home)
+  val CAR = Car(100, Home)
 
   "Driving" should "not be possible if you aren't with the car" in {
     val sceneResult = Scenarios.processScenes(
@@ -51,9 +51,6 @@ class ImmutableCarTests extends FlatSpec {
     }
 
     Person.drive(JOE, CAR, Home)
-
-    if (CAR.condition != Pristine)
-      Person.clean(JOE, CAR)
 
     Person.drive(JOE, CAR, JanesHouse)
     Person.drive(JOE, CAR, Home)
