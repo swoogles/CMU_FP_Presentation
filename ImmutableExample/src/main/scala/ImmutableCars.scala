@@ -18,7 +18,9 @@ object Car {
   val tripCost = 20
 
   def drive(car: Car, destination: Location): Try[Car] = {
-    if (car.fuel > tripCost) {
+    if (car.location == destination) {
+      Success(car)
+    } else if (car.fuel > tripCost) {
       Success(Car(car.fuel - tripCost, car.condition, destination))
     } else {
       Failure(new Exception("Ran out of gas!"))
