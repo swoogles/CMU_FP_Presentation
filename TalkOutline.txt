@@ -1,10 +1,10 @@
 How to start living and loving the fantasy world of software
 -The real world has so many flaws:
-  - Decay
-  - Malfunction
-  - Natural Disasters
-  - Human treachery
-  - Human incompetence
+  * Decay
+  * Malfunction
+  * Natural Disasters
+  * Human treachery
+  * Human incompetence
 - By interacting with it only when absolutely necessary, we can experience
   undreamed-of consistency.
 - We need only trust that the laws of nature (components of the processor) are
@@ -227,3 +227,31 @@ Fun/Important Scala Projects
 
 Fun/Important FP Projects
 - Haskell type-based search engine
+
+Person.drive(joe, mutableCar, School) // Error: Joe can't drive a car if he's not in
+the same location
+
+if (mutableCar.location == Home) { // Now we're safe. Sort've.
+  println("Sam's driving")
+    Person.drive(sam, mutableCar, School)
+}
+
+Person.drive(joe, mutableCar, Home)
+
+  if (mutableCar.condition != Pristine)
+  Person.clean(joe, mutableCar)
+  Person.drive(joe, mutableCar, JanesHouse)
+Person.drive(joe, mutableCar, Home)
+
+  if (mutableCar.fuel < 100)
+Person.fill(joe, mutableCar)
+
+  if (mutableCar.fuel > 80) {
+    Person.drive(sam, mutableCar, Restaurant)
+      Person.drive(sam, mutableCar, School)
+      Person.drive(sam, mutableCar, Home)
+      Person.drive(sam, mutableCar, School)
+      Person.drive(sam, mutableCar, Home)
+      Person.drive(joe, mutableCar, School) // Error: Out of
+      gas!
+  }
