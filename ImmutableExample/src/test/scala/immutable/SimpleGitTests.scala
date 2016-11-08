@@ -4,7 +4,6 @@ import org.scalatest.FlatSpec
 
 class SimpleGitTests extends FlatSpec {
   val initialCommit = Commit(
-    "00001",
     List(
       (0, "package immutable"),
       (1, "class GitClient {"),
@@ -15,7 +14,6 @@ class SimpleGitTests extends FlatSpec {
   )
 
   val urlAndLanguageCommit = Commit(
-    "00002",
     List(
       //      (2, """val url = "https://github.com/swoogles/CMU_FP_Presentation" """),
       //      (3, """val language = "scala" """)
@@ -27,7 +25,6 @@ class SimpleGitTests extends FlatSpec {
   )
 
   val languageChangeCommit = Commit(
-    "00003",
     List(
       (3, "   val language = \"scala\"")
     ),
@@ -38,7 +35,6 @@ class SimpleGitTests extends FlatSpec {
   )
 
   val addLoopCommit = Commit(
-    "00004",
     List(
       (4, "   for (i <- Range(0,5) {"),
       (5, "      i * 2"),
@@ -49,7 +45,6 @@ class SimpleGitTests extends FlatSpec {
   )
 
   val addDataClasses = Commit(
-    "00005",
     List(
       (1, "case class Car(fuel: Int, location: Location)"),
       (2, "case class Person(name: String, location: Location)"),

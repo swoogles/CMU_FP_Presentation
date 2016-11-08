@@ -1,7 +1,11 @@
 package immutable
 
 // TODO figure out how to mesh linesAdded and linesRemoved with their changing indices
-case class Commit(hash: String, linesAdded: List[(Int, String)], linesRemoved: List[Int], previousCommit: Option[Commit]) {
+case class Commit(linesAdded: List[(Int, String)], linesRemoved: List[Int], previousCommit: Option[Commit]) {
+  def hash: Int = previousCommit match {
+    case Some(prevCommit) => prevCommit.hash + 1
+    case None => 0
+  }
   def content: List[String] = {
     if (previousCommit == None)
       linesAdded.map{ case (lineNum, line) => line}
