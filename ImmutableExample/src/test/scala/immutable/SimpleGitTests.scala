@@ -6,68 +6,40 @@ class SimpleGitTests extends FlatSpec {
   val initialCommit = Commit(
     List(
       (0, "package immutable"),
-      (1, "class GitClient {"),
-      (2, "}")
+      (1, "")
     ),
     List(),
     None
   )
 
-  val urlAndLanguageCommit = Commit(
+  val addDataClasses = Commit(
     List(
-      //      (2, """val url = "https://github.com/swoogles/CMU_FP_Presentation" """),
-      //      (3, """val language = "scala" """)
-      (2, "   val url = \"https://github.com/swoogles/CMU_FP_Presentation\""),
-      (3, "   val language = \"java\"")
+      (2, "case class Car(fuel: Int, location: Location)"),
+      (3, "case class Person(name: String, location: Location)"),
+      (4, "")
     ),
     List(),
     Some(initialCommit)
   )
 
-  val languageChangeCommit = Commit(
+  val addLocations = Commit(
     List(
-      (3, "   val language = \"scala\"")
-    ),
-    List(
-      3
-    ),
-    Some(urlAndLanguageCommit)
-  )
-
-  val addLoopCommit = Commit(
-    List(
-      (4, "   for (i <- Range(0,5) {"),
-      (5, "      i * 2"),
-      (6, "   }")
+      (2, "sealed trait Location"),
+      (3, "case object School extends Location"),
+      (4, "case object Home extends Location"),
+      (5, "case object Restaurant extends Location"),
+      (6, "")
     ),
     List(),
-    Some(languageChangeCommit)
+    Some(addDataClasses)
   )
 
-  val addDataClasses = Commit(
-    List(
-      (1, "case class Car(fuel: Int, location: Location)"),
-      (2, "case class Person(name: String, location: Location)"),
-      (3, "")
-    ),
-    List(),
-    Some(addLoopCommit)
-  )
-
-  "basic git shit 1 step" should "work" in {
-    println("combined content 1 step: ")
-    urlAndLanguageCommit.content foreach println
-  }
-  "basic git shit 2 step" should "work" in {
-    println("combined content 2 step: ")
-    languageChangeCommit.content foreach println
-  }
-  "basic git shit 3 step" should "work" in {
-    println("combined content 3 step: ")
-    addLoopCommit.content foreach println
-  }
   "basic git shit 4 step" should "work" in {
-    println("combined content 3 step: ")
+    println("combined content 4 step: ")
     addDataClasses.content foreach println
+  }
+  "basic git shit 5 step" should "work" in {
+    println("combined content 5 step: ")
+    addLocations.content foreach println
   }
 }
