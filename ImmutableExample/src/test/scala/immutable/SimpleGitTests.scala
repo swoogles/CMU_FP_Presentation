@@ -37,6 +37,17 @@ class SimpleGitTests extends FlatSpec {
     Some(urlAndLanguageCommit)
   )
 
+  val addLoopCommit = Commit(
+    "00003",
+    List(
+      (4, "for (i <- Range(0,5) {"),
+      (5, "   i * 2"),
+      (6, "}")
+    ),
+    List(),
+    Some(languageChangeCommit)
+  )
+
   "basic git shit 1 step" should "work" in {
     println("combined content 1 step: ")
     urlAndLanguageCommit.content foreach println
@@ -44,5 +55,9 @@ class SimpleGitTests extends FlatSpec {
   "basic git shit 2 step" should "work" in {
     println("combined content 2 step: ")
     languageChangeCommit.content foreach println
+  }
+  "basic git shit 3 step" should "work" in {
+    println("combined content 3 step: ")
+    addLoopCommit.content foreach println
   }
 }
