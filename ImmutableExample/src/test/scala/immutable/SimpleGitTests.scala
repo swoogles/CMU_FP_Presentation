@@ -19,8 +19,8 @@ class SimpleGitTests extends FlatSpec {
     List(
       //      (2, """val url = "https://github.com/swoogles/CMU_FP_Presentation" """),
       //      (3, """val language = "scala" """)
-      (1, "val url = \"https://github.com/swoogles/CMU_FP_Presentation\""),
-      (2, "val language = \"java\"")
+      (2, "val url = \"https://github.com/swoogles/CMU_FP_Presentation\""),
+      (3, "val language = \"java\"")
     ),
     List(),
     Some(initialCommit)
@@ -29,7 +29,7 @@ class SimpleGitTests extends FlatSpec {
   val languageChangeCommit = Commit(
     "00003",
     List(
-      (1, "val language = \"scala\"")
+      (3, "val language = \"scala\"")
     ),
     List(
       3
@@ -37,9 +37,12 @@ class SimpleGitTests extends FlatSpec {
     Some(urlAndLanguageCommit)
   )
 
-  "basic git shit" should "work" in {
-    println("combined content: ")
+  "basic git shit 1 step" should "work" in {
+    println("combined content 1 step: ")
+    urlAndLanguageCommit.content foreach println
+  }
+  "basic git shit 2 step" should "work" in {
+    println("combined content 2 step: ")
     languageChangeCommit.content foreach println
-
   }
 }
