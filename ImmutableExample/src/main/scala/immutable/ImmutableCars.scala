@@ -1,17 +1,11 @@
-package com.bfrasure.fp.cmu.immutable
+package immutable
 
 import scala.util.{Failure, Success, Try}
-
-sealed trait Condition
-case object Pristine extends Condition
-case object Decent extends Condition
-case object Trashed extends Condition
 
 sealed trait Location
 case object School extends Location
 case object Home extends Location
 case object Restaurant extends Location
-case object JanesHouse extends Location
 
 case class Car(fuel: Int, location: Location)
 object Car {
@@ -20,13 +14,14 @@ object Car {
   def drive(car: Car, destination: Location): Try[Car] = {
     if (car.location == destination) {
       Success(car)
-    } else if (car.fuel > tripCost) {
+    } else if (car.fuel >= tripCost) {
       Success(Car(car.fuel - tripCost, destination))
     } else {
       Failure(new Exception("Ran out of gas!"))
     }
   }
 }
+
 case class Person(name: String, location: Location)
 object Person {
   def drive(person: Person, car: Car, destination: Location): Try[(Person, Car)] = {
@@ -46,8 +41,12 @@ object Person {
 
   // TODO: Make person parameter relevant in some way.
   //       Possibly just accept that it doesn't have a software need here.
-  def fill(person: Person, car: Car): Car =
-    car.copy(fuel = 100)
+  def fill(person: Person, car: Car): Try[Car] =
+    if (person.location == car.location) {
+      Success(car.copy(fuel = 100))
+    } else {
+      Failure(new Exception( s"${person.name} is at ${person.location}, but Car is at $car.location" ))
+    }
 }
 
 case class Intentions(joe: Location, sam: Location)

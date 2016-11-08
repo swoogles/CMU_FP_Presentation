@@ -1,4 +1,4 @@
-package com.bfrasure.fp.cmu.immutable
+package immutable
 
 import org.scalatest.FlatSpec
 
@@ -36,25 +36,15 @@ class ImmutableCarTests extends FlatSpec {
       Intentions(School, Home)
     )
     assert(sceneResult.isFailure, true)
+  }
 
+  "A car" should "should always have fuel after fuel check." in {
+    assert(CAR.fuel == 100)
+    Person.drive(SAM, CAR, Restaurant)
+    assert(CAR.fuel == 100)
   }
 
   def scenes = {
-    Scenarios.processScenes(
-      SAM, JOE, CAR,
-      Intentions(School, Home)
-    )
-
-    if (CAR.location == Home) { // Now we're safe. Sort've.
-      println("Sam's driving")
-      Person.drive(SAM, CAR, School)
-    }
-
-    Person.drive(JOE, CAR, Home)
-
-    Person.drive(JOE, CAR, JanesHouse)
-    Person.drive(JOE, CAR, Home)
-
     if (CAR.fuel < 100)
       Person.fill(JOE, CAR)
   }

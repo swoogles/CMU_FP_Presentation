@@ -1,6 +1,6 @@
-package com.bfrasure.fp.cmu.mutable
+package mutable
 
-import org.scalatest.FlatSpec
+import org.scalatest.{Assertion, FlatSpec}
 
 class MutableCarTests extends FlatSpec {
 
@@ -31,6 +31,18 @@ class MutableCarTests extends FlatSpec {
         println("made it to the end?")
       }
     }
+  }
+
+  "Car and driver" should "never end in different locations" in {
+    val blah: Assertion = assertThrows[Exception] {
+      car.fuel = 0
+      try {
+        joe.drive(car, School) // Error: Out of gas!
+      } catch {
+        case ex: Exception => println("exception: " + ex)
+      }
+    }
+    assert(joe.location != Home)
   }
 
 //  def scenes = {
