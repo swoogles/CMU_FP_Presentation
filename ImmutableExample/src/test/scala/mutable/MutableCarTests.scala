@@ -28,21 +28,17 @@ class MutableCarTests extends FlatSpec {
         sam.drive(car, School)
         sam.drive(car, Home)
         joe.drive(car, School) // Error: Out of gas!
-        println("made it to the end?")
       }
     }
   }
 
-  "Car and driver" should "never end in different locations" in {
+  "Car and driver" should "end in different locations to demonstrate subtle bug" in {
     val blah: Assertion = assertThrows[Exception] {
       car.fuel = 0
-      try {
-        joe.drive(car, School) // Error: Out of gas!
-      } catch {
-        case ex: Exception => println("exception: " + ex)
-      }
+      joe.drive(car, School) // Error: Out of gas!
     }
-    assert(joe.location != Home)
+    assert(joe.location == School)
+    assert(car.location == Home)
   }
 
 //  def scenes = {

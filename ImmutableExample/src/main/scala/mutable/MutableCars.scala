@@ -17,18 +17,17 @@ case class Car(var fuel: Int, var location: Location) {
 
 case class Person(var name: String, var location: Location) {
   def drive(car: Car, destination: Location): Unit = {
-    if(this.location == car.location) {
+    if(this.location != car.location) {
       throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${car.location}") // Abort!
     }
     // Which of these 2 should go first?
     this.location = destination // Intentional danger here. If car.drive fails, then somehow the passenger managed to
                                 // travel without their vehicle
-    println("changed driver's location to : " + this.location)
     car.drive(destination)
   }
 
   def fill(car: Car): Unit = {
-    if(this.location == car.location) {
+    if(this.location != car.location) {
       throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${car.location}") // Abort!
     }
     car.fuel = 100
