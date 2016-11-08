@@ -23,25 +23,23 @@ class SimpleGitTests extends FlatSpec {
       (2, "val language = \"java\"")
     ),
     List(),
-    None
+    Some(initialCommit)
   )
 
   val languageChangeCommit = Commit(
     "00003",
     List(
-      (3, "val language = \"scala\"")
+      (1, "val language = \"scala\"")
     ),
     List(
       3
     ),
-    None
+    Some(urlAndLanguageCommit)
   )
 
   "basic git shit" should "work" in {
-    val linkedCommit = urlAndLanguageCommit.copy(previousCommit = Some(initialCommit))
-    val chainedCommit = languageChangeCommit.copy(previousCommit = Some(linkedCommit))
     println("combined content: ")
-    chainedCommit.content foreach println
+    languageChangeCommit.content foreach println
 
   }
 }
