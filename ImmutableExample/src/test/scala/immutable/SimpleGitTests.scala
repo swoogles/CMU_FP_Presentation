@@ -12,14 +12,24 @@ class SimpleGitTests extends FlatSpec {
     None
   )
 
-  val addDataClasses = Commit(
+  val addMutableDataClasses = Commit(
+    List(
+      (2, "case class Car(var fuel: Int, var location: Location)"),
+      (3, "case class Person(var name: String, var location: Location)"),
+      (4, "")
+    ),
+    List(),
+    Some(initialCommit)
+  )
+
+  val addImmutableDataClasses = Commit(
     List(
       (2, "case class Car(fuel: Int, location: Location)"),
       (3, "case class Person(name: String, location: Location)"),
       (4, "")
     ),
-    List(),
-    Some(initialCommit)
+    List(2, 3, 4),
+    Some(addMutableDataClasses)
   )
 
   val addLocations = Commit(
@@ -31,12 +41,17 @@ class SimpleGitTests extends FlatSpec {
       (6, "")
     ),
     List(),
-    Some(addDataClasses)
+    Some(addImmutableDataClasses)
   )
+
+  "basic git shit 3 step" should "work" in {
+    println("combined content 4 step: ")
+    addMutableDataClasses.content foreach println
+  }
 
   "basic git shit 4 step" should "work" in {
     println("combined content 4 step: ")
-    addDataClasses.content foreach println
+    addImmutableDataClasses.content foreach println
   }
   "basic git shit 5 step" should "work" in {
     println("combined content 5 step: ")

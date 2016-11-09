@@ -8,13 +8,6 @@ class MutableCarTests extends FlatSpec {
   var joe = Person("Joe", Home)
   var car = Car(100, Home)
 
-  "Driving" should "not be possible if you aren't with the car" in {
-    assert(1==1)
-  }
-
-  "Driving" should "fail if both people want to travel to different places." in {
-    assert(1==1)
-  }
 
   "Driving" should "cease when you run out of gas" in {
     assertThrows[Exception] {

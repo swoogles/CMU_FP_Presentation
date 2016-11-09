@@ -12,12 +12,10 @@ object Car {
   val tripCost = 20
 
   def drive(car: Car, destination: Location): Try[Car] = {
-    if (car.location == destination) {
-      Success(car)
-    } else if (car.fuel >= tripCost) {
-      Success(Car(car.fuel - tripCost, destination))
-    } else {
-      Failure(new Exception("Ran out of gas!"))
+    car match {
+      case Car(_, location) if (location == destination) => Success(car)
+      case Car(fuel, _) if (fuel >= tripCost) => Success(Car(car.fuel - tripCost, destination))
+      case _ => Failure(new Exception("Ran out of gas!"))
     }
   }
 }
@@ -25,27 +23,22 @@ object Car {
 case class Person(name: String, location: Location)
 object Person {
   def drive(person: Person, car: Car, destination: Location): Try[(Person, Car)] = {
-    if (person.location == destination) {
-      Success((person, car))
-    } else {
-      if (person.location == car.location) {
-        Car.drive(car, destination) flatMap { (movedCar: Car) =>
-          val newPerson = Person(person.name, destination)
-          Success((newPerson, movedCar))
+    person.location match {
+      case `destination` => Success((person, car)) // TODO See if this backtick crap can be avoided.
+      case car.location =>
+        Car.drive(car, destination) flatMap { movedCar =>
+          Success((person.copy(location = destination), movedCar))
         }
-      } else {
-        Failure(new Exception( "Car and driver aren't in the same place!"))
-      }
+      case invalidLocation => Failure(new Exception( "Car and driver aren't in the same place!"))
     }
   }
 
   // TODO: Make person parameter relevant in some way.
   //       Possibly just accept that it doesn't have a software need here.
   def fill(person: Person, car: Car): Try[Car] =
-    if (person.location == car.location) {
-      Success(car.copy(fuel = 100))
-    } else {
-      Failure(new Exception( s"${person.name} is at ${person.location}, but Car is at $car.location" ))
+    person.location match {
+      case car.location => Success(car.copy(fuel = 100))
+      case _ => Failure(new Exception( s"${person.name} is at ${person.location}, but Car is at $car.location" ))
     }
 }
 
@@ -58,6 +51,7 @@ object Scenarios {
       (newJoe, newSam, finalCar)
     }
   }
+  // TODO consider a version which returns the last successful state of things.
 
   def processScenes(joe: Person, sam: Person, car: Car, intentions: Intentions*): Try[(Person, Person, Car)] =
     processScenes(joe, sam, car, intentions.toList)

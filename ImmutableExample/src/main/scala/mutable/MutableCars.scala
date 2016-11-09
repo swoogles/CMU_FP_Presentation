@@ -20,7 +20,6 @@ case class Person(var name: String, var location: Location) {
     if(this.location != car.location) {
       throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${car.location}") // Abort!
     }
-    // Which of these 2 should go first?
     this.location = destination // Intentional danger here. If car.drive fails, then somehow the passenger managed to
                                 // travel without their vehicle
     car.drive(destination)

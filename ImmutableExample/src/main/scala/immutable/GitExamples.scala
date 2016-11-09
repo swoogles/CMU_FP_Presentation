@@ -1,26 +1,30 @@
 package immutable
 
 // TODO figure out how to mesh linesAdded and linesRemoved with their changing indices
+// TODO Look into 2 classes here, rather than 1 with an optional header
 case class Commit(linesAdded: List[(Int, String)], linesRemoved: List[Int], previousCommit: Option[Commit]) {
   def hash: Int = previousCommit match {
     case Some(prevCommit) => prevCommit.hash + 1
     case None => 0
   }
-  def content: List[String] = {
-    if (previousCommit == None)
-      linesAdded.map{ case (lineNum, line) => line}
-    else {
-      val contentSoFar = previousCommit.get.content
-      val contentWithLinesRemoved: List[String] = linesRemoved.reverse.foldLeft(contentSoFar) {
-        (innerContentSoFar, lineToRemove) => innerContentSoFar.take(lineToRemove) ++ innerContentSoFar.drop(lineToRemove+1)
 
+  def content: List[String] = {
+    previousCommit match {
+      case None => linesAdded.map { case (lineNum, line) => line }
+      case Some(prevCommit) => {
+        val contentSoFar = prevCommit.content
+        val contentWithLinesRemoved: List[String] = linesRemoved.reverse.foldLeft(contentSoFar) {
+          (innerContentSoFar, lineToRemove) => innerContentSoFar.take(lineToRemove) ++ innerContentSoFar.drop(lineToRemove + 1)
+
+        }
+        val contentWithLinesAdded: List[String] = linesAdded.foldLeft(contentWithLinesRemoved) { (innerContentSoFar, lineToAdd) => {
+          val (newLineIdx, newLineContent) = lineToAdd
+          val (contentBeginning, contentEnding) = innerContentSoFar.splitAt(newLineIdx)
+          contentBeginning ::: newLineContent :: contentEnding
+        }
+        }
+        contentWithLinesAdded
       }
-      val contentWithLinesAdded: List[String] = linesAdded.foldLeft(contentWithLinesRemoved) { (innerContentSoFar, lineToAdd) => {
-        val (newLineIdx, newLineContent) = lineToAdd
-        val (contentBeginning, contentEnding) = innerContentSoFar.splitAt(newLineIdx)
-        contentBeginning ::: newLineContent :: contentEnding
-      }}
-      contentWithLinesAdded
     }
 
   }
