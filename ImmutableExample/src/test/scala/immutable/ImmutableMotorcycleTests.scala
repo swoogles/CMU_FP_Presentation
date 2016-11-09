@@ -16,6 +16,7 @@ class ImmutableMotorcycleTests extends FlatSpec {
       Intentions(joe=Home, sam=Restaurant)
     )
     assert(sceneResult.isFailure, true)
+    sceneResult
   }
 
   "Driving" should "fail if both people want to travel to different places." in {
@@ -27,7 +28,6 @@ class ImmutableMotorcycleTests extends FlatSpec {
 
   }
 
-  // TODO test out single person intentions passed to each step as a group
   "Driving" should "cease when you run out of gas" in {
     val sceneResult = Scenarios.processScenesCumulative(
       SAM, JOE, CAR,
@@ -39,13 +39,31 @@ class ImmutableMotorcycleTests extends FlatSpec {
       Intentions(joe=School, sam=Home)
     )
 
+    import pprint.Config
+    implicit val pprintConfig = Config()
+    pprint.pprintln(sceneResult)
+    assert(sceneResult.last.isFailure, true)
+  }
+
+  "Driving" should "cease when you run out of gas, but preserve last state" in {
+    val sceneResult = Scenarios.processScenesKeepLastGoodState(
+      SAM, JOE, CAR,
+      Intentions(joe=Home, sam=Restaurant),
+      Intentions(joe=Home, sam=School),
+      Intentions(joe=Home, sam=Home),
+      Intentions(joe=Home, sam=School),
+      Intentions(joe=Home, sam=Home),
+      Intentions(joe=School, sam=Home)
+    )
 
     import pprint.Config
     implicit val pprintConfig = Config()
-//    val myList = List(1, 2, 3)
     pprint.pprintln(sceneResult)
-//    sceneResult foreach pprint.pprintln
-    assert(sceneResult.last.isFailure, true)
+//    assert(sceneResult.left.isFailure, true)
+    sceneResult match {
+      case Right(nonBrokenScene) => fail()
+      case Left(failedSceneWithState) => println("Failed scene: " + failedSceneWithState)
+    }
   }
 
   "Driving" should "allow both people to ride in the same car to the same place" in {
@@ -64,10 +82,7 @@ class ImmutableMotorcycleTests extends FlatSpec {
         .drive(School).get
         .drive(Home)
 
-    val driveFunc = (x: OccupiedMotorcycle) => x.drive _
-
     assert(chainedResult.isSuccess)
-    println("chainedResult: " + chainedResult)
   }
 
   "Occupied Car" should "move car and driver together in a chainable, but unsafe, way" in {
@@ -77,9 +92,6 @@ class ImmutableMotorcycleTests extends FlatSpec {
         .driveNoTry(Restaurant)
         .driveNoTry(School)
         .driveNoTry(Home)
-
-//    assert(chainedResult.isSuccess)
-    println("chainedResult: " + chainedResult)
   }
 
   "Driving" should "utilize the builder pattern" in {
@@ -100,22 +112,13 @@ class ImmutableMotorcycleTests extends FlatSpec {
       (newSam3, newCar3) <- Person.drive(newSam2, CAR, Restaurant)
     ) yield  { (newSam3, newCar3)}
 
-//    res map { case (movedperson, drivenCar) =>
-//        Person.drive(movedperson, drivenCar, Home)
-//    }
-
     assert(multiDrivingResult.isFailure)
   }
 
   "A car" should "should always have fuel after fuel check." in {
     assert(CAR.fuel == 100)
-    Person.drive(SAM, CAR, Restaurant)
+    Person.drive(SAM, CAR, Restaurant) // Does nothing, since the result is ignored
     assert(CAR.fuel == 100)
-  }
-
-  def scenes = {
-    if (CAR.fuel < 100)
-      Person.fill(JOE, CAR)
   }
 
 }

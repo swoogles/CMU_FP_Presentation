@@ -89,6 +89,22 @@ object Scenarios {
     }
   }
 
+  def processScenesKeepLastGoodState(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: Intentions*): Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] =
+    processScenesKeepLastGoodState(joe, sam, motorcycle, intentions.toList)
+
+  def processScenesKeepLastGoodState(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: List[Intentions]): Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] = {
+    val startState: Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] = Right((joe, sam, motorcycle))
+    intentions.foldLeft(startState) {
+      case (Right((curJoe, curSam, curMotorcycle)), curIntentions) => {
+        updateScene(curJoe, curSam, curMotorcycle, curIntentions) match {
+          case Success(sceneTuple) => Right(sceneTuple)
+          case Failure(ex) => Left((ex, (curJoe, curSam, curMotorcycle)))
+        }
+      }
+      case (Left(lastGoodStateWithException), curIntentions) => Left(lastGoodStateWithException)
+    }
+  }
+
   def processScenesCumulative(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: Intentions*): List[Try[(Person, Person, Motorcycle)]] =
     processScenesCumulative(joe, sam, motorcycle, intentions.toList)
 
