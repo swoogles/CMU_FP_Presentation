@@ -44,6 +44,50 @@ class SimpleGitTests extends FlatSpec {
     Some(addImmutableDataClasses)
   )
 
+  val allCommitsInOrder = List(
+    initialCommit,
+    addMutableDataClasses,
+    addImmutableDataClasses,
+    addLocations
+  )
+
+  val srcFileSnapShot =
+    List(
+      "package immutable",
+      "",
+      "case class Car(fuel: Int, location: Location)",
+      "case class Person(name: String, location: Location)"
+    )
+
+  val srcFileSnapShotExpected =
+    List(
+      "package immutable",
+      "",
+      "sealed trait Location",
+      "case object School extends Location",
+      "case object Home extends Location",
+      "case object Restaurant extends Location",
+      "",
+      "case class Car(fuel: Int, location: Location)",
+      "case class Person(name: String, location: Location)"
+    )
+
+  "Git code" should "update content in a single encapsulated function" in {
+    val updatedContent = Commit.updateContent(srcFileSnapShot, addLocations)
+//    updatedContent === srcFileSnapShotExpected
+    assert(updatedContent == srcFileSnapShotExpected)
+
+  }
+
+  "commits " should "assemble into a proper final codebase" in {
+    for ((codeSnapShot, idx) <- Commit.processCommits(allCommitsInOrder).zipWithIndex) {
+      println("============================================")
+      println(s"Snapshot $idx: ")
+      codeSnapShot foreach println
+      println("============================================")
+    }
+  }
+
   "basic git shit 3 step" should "work" in {
     println("combined content 4 step: ")
     addMutableDataClasses.content foreach println

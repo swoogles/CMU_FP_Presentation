@@ -38,7 +38,13 @@ class ImmutableCarTests extends FlatSpec {
       Intentions(joe=Home, sam=Home),
       Intentions(joe=School, sam=Home)
     )
-    sceneResult foreach println
+
+
+    import pprint.Config
+    implicit val pprintConfig = Config()
+//    val myList = List(1, 2, 3)
+    pprint.pprintln(sceneResult)
+//    sceneResult foreach pprint.pprintln
     assert(sceneResult.last.isFailure, true)
   }
 

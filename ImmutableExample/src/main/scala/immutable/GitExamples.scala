@@ -29,6 +29,31 @@ case class Commit(linesAdded: List[(Int, String)], linesRemoved: List[Int], prev
 
   }
 }
+object Commit {
+  def updateContent(contentSoFar: List[String], nextCommit: Commit) = {
+    val contentWithLinesRemoved: List[String] = nextCommit.linesRemoved.reverse.foldLeft(contentSoFar) {
+      (innerContentSoFar, lineToRemove) => innerContentSoFar.take(lineToRemove) ++ innerContentSoFar.drop(lineToRemove + 1)
+
+    }
+    val contentWithLinesAdded: List[String] = nextCommit.linesAdded.foldLeft(contentWithLinesRemoved) { (innerContentSoFar, lineToAdd) => {
+      val (newLineIdx, newLineContent) = lineToAdd
+      val (contentBeginning, contentEnding) = innerContentSoFar.splitAt(newLineIdx)
+      contentBeginning ::: newLineContent :: contentEnding
+    }
+    }
+    contentWithLinesAdded
+  }
+
+
+  def processCommits(history: List[Commit]): List[List[String]] = {
+    history.scanLeft(List("")) { (content, nextCommit) =>
+      updateContent(content, nextCommit)
+    }
+    history.scanLeft(List("")) { updateContent }
+  }
+
+
+}
 case class Branch(hash: String, history: List[Commit]) {
   assert(!history.isEmpty)
 }
