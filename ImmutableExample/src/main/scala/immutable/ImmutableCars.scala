@@ -42,9 +42,35 @@ object Person {
     }
 }
 
+case class OccupiedCar(passenger: Person, car: Car) {
+  def drive(destination: Location): Try[OccupiedCar] = {
+    destination match {
+      case passenger.location => Success(this)
+      case newDestination =>
+        Car.drive(car, destination) flatMap { movedCar =>
+          Success(OccupiedCar(passenger.copy(location = destination), movedCar))
+        }
+    }
+  }
+
+  def driveNoTry(destination: Location): OccupiedCar = {
+    destination match {
+      case passenger.location => this
+      case newDestination =>
+        val driveResult: Try[OccupiedCar] = Car.drive(car, destination) map { movedCar =>
+          OccupiedCar(passenger.copy(location = destination), movedCar)
+        }
+        driveResult.getOrElse(this)
+    }
+  }
+
+}
+
 case class Intentions(joe: Location, sam: Location)
+case class Intention(person: Person, destination: Location)
 
 object Scenarios {
+
   def updateScene(joe: Person, sam: Person, car: Car, intentions: Intentions): Try[(Person, Person, Car)] = {
     for ((newJoe, newCar) <- Person.drive(joe, car, intentions.joe);
          (newSam, finalCar) <- Person.drive(sam, newCar, intentions.sam) ) yield {
@@ -63,6 +89,15 @@ object Scenarios {
     }
   }
 
+  def processScenesCumulative(joe: Person, sam: Person, car: Car, intentions: Intentions*): List[Try[(Person, Person, Car)]] =
+    processScenesCumulative(joe, sam, car, intentions.toList)
+
+  def processScenesCumulative(joe: Person, sam: Person, car: Car, intentions: List[Intentions]): List[Try[(Person, Person, Car)]] = {
+    intentions.scanLeft(Try((joe, sam, car))) {
+      case (Success((curJoe, curSam, curCar)), curIntentions) => updateScene(curJoe, curSam, curCar, curIntentions)
+      case (Failure(ex), curIntentions) => Failure(ex)
+    }
+  }
 
 
 }
