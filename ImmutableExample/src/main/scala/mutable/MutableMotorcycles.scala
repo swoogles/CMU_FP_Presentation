@@ -5,7 +5,7 @@ object School extends Location
 object Home extends Location
 object Restaurant extends Location
 
-case class Car(var fuel: Int, var location: Location) {
+case class Motorcycle(var fuel: Int, var location: Location) {
   val tripCost = 20
   def drive(destination: Location): Unit = {
     if (this.fuel < tripCost)
@@ -16,31 +16,31 @@ case class Car(var fuel: Int, var location: Location) {
 }
 
 case class Person(var name: String, var location: Location) {
-  def drive(car: Car, destination: Location): Unit = {
-    if(this.location != car.location) {
-      throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${car.location}") // Abort!
+  def drive(motorcycle: Motorcycle, destination: Location): Unit = {
+    if(this.location != motorcycle.location) {
+      throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${motorcycle.location}") // Abort!
     }
     this.location = destination // Intentional danger here. If car.drive fails, then somehow the passenger managed to
                                 // travel without their vehicle
-    car.drive(destination)
+    motorcycle.drive(destination)
   }
 
-  def fill(car: Car): Unit = {
-    if(this.location != car.location) {
-      throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${car.location}") // Abort!
+  def fill(motorcycle: Motorcycle): Unit = {
+    if(this.location != motorcycle.location) {
+      throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${motorcycle.location}") // Abort!
     }
-    car.fuel = 100
+    motorcycle.fuel = 100
   }
 }
 
 object MutableScenarios {
   var sam: Person = null
   var joe: Person = null
-  var mutableCar: Car = null
+  var motorcycle: Motorcycle = null
 
   def resetVars(): Unit = {
     sam = Person("Sam", Home)
     joe = Person("Joe", Home)
-    mutableCar = Car(100, Home)
+    motorcycle = Motorcycle(100, Home)
   }
 }

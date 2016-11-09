@@ -4,11 +4,11 @@ import org.scalatest.FlatSpec
 
 import scala.util.Try
 
-class ImmutableCarTests extends FlatSpec {
+class ImmutableMotorcycleTests extends FlatSpec {
 
   val SAM = Person("Sam", Home)
   val JOE = Person("Joe", Home)
-  val CAR = Car(100, Home)
+  val CAR = Motorcycle(100, Home)
 
   "Driving" should "not be possible if you aren't with the car" in {
     val sceneResult = Scenarios.processScenes(
@@ -57,21 +57,21 @@ class ImmutableCarTests extends FlatSpec {
   }
 
   "Occupied Car" should "move car and driver together in a chainable, but obnoxious, way" in {
-    val occupiedCar = OccupiedCar(SAM, CAR)
+    val occupiedCar = OccupiedMotorcycle(SAM, CAR)
     val chainedResult =
       occupiedCar
         .drive(Restaurant).get
         .drive(School).get
         .drive(Home)
 
-    val driveFunc = (x: OccupiedCar) => x.drive _
+    val driveFunc = (x: OccupiedMotorcycle) => x.drive _
 
     assert(chainedResult.isSuccess)
     println("chainedResult: " + chainedResult)
   }
 
   "Occupied Car" should "move car and driver together in a chainable, but unsafe, way" in {
-    val occupiedCar = OccupiedCar(SAM, CAR)
+    val occupiedCar = OccupiedMotorcycle(SAM, CAR)
     val chainedResult =
       occupiedCar
         .driveNoTry(Restaurant)
@@ -92,9 +92,9 @@ class ImmutableCarTests extends FlatSpec {
       Intentions(joe=Home, sam=Home),
       Intentions(joe=School, sam=Home)
     )
-    val res: Try[(Person, Car)] = Person.drive(SAM, CAR, Restaurant)
+    val res: Try[(Person, Motorcycle)] = Person.drive(SAM, CAR, Restaurant)
 
-    val multiDrivingResult: Try[(Person, Car)] = for (
+    val multiDrivingResult: Try[(Person, Motorcycle)] = for (
       (newSam, newCar) <- Person.drive(SAM, CAR, Restaurant);
       (newSam2, newCar2) <- Person.drive(newSam, CAR, Restaurant);
       (newSam3, newCar3) <- Person.drive(newSam2, CAR, Restaurant)
