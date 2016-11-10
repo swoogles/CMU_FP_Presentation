@@ -16,12 +16,13 @@ case class Motorcycle(var fuel: Int, var location: Location) {
 }
 
 case class Person(var name: String, var location: Location) {
+
+  // Spot the bug in this method!
   def drive(motorcycle: Motorcycle, destination: Location): Unit = {
     if(this.location != motorcycle.location) {
       throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${motorcycle.location}") // Abort!
     }
-    this.location = destination // Intentional danger here. If car.drive fails, then somehow the passenger managed to
-                                // travel without their vehicle
+    this.location = destination
     motorcycle.drive(destination)
   }
 
@@ -44,3 +45,5 @@ object MutableScenarios {
     motorcycle = Motorcycle(100, Home)
   }
 }
+
+
