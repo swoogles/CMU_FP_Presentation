@@ -3,6 +3,7 @@ package immutable
 import org.scalatest.FlatSpec
 
 class GitTests extends FlatSpec {
+
   val initialCommit = LeafCommit(
     List(
       (0, "package immutable"),

@@ -20,7 +20,7 @@ case class Person(var name: String, var location: Location) {
   // Spot the bug in this method!
   def drive(motorcycle: Motorcycle, destination: Location): Unit = {
     if(this.location != motorcycle.location) {
-      throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${motorcycle.location}") // Abort!
+      throw new Exception("Car and driver aren't in the same place!") // Abort!
     }
     this.location = destination
     motorcycle.drive(destination)
@@ -28,22 +28,8 @@ case class Person(var name: String, var location: Location) {
 
   def fill(motorcycle: Motorcycle): Unit = {
     if(this.location != motorcycle.location) {
-      throw new Exception(s"${this.name} is at ${this.location}, but Car is at ${motorcycle.location}") // Abort!
+      throw new Exception("Car and driver aren't in the same place!") // Abort!
     }
     motorcycle.fuel = 100
   }
 }
-
-object MutableScenarios {
-  var sam: Person = null
-  var joe: Person = null
-  var motorcycle: Motorcycle = null
-
-  def resetVars(): Unit = {
-    sam = Person("Sam", Home)
-    joe = Person("Joe", Home)
-    motorcycle = Motorcycle(100, Home)
-  }
-}
-
-

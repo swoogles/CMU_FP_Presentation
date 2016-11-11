@@ -15,7 +15,7 @@ class ImmutableMotorcycleTests extends FlatSpec {
   "Driving" should "not be possible if you aren't with the car" in {
     val sceneResult = Scenarios.processMovements(
       SAM, JOE, CAR.copy(location=Restaurant),
-      Movements(joe=Home, sam=Restaurant)
+      SceneUpdate(joe=Home, sam=Restaurant)
     )
     assert(sceneResult.isFailure, true)
     sceneResult
@@ -24,7 +24,7 @@ class ImmutableMotorcycleTests extends FlatSpec {
   "Driving" should "fail if both people want to travel to different places." in {
     val sceneResult = Scenarios.processMovements(
       SAM, JOE, CAR,
-      Movements(joe=School, sam=Restaurant)
+      SceneUpdate(joe=School, sam=Restaurant)
     )
     assert(sceneResult.isFailure, true)
 
@@ -33,12 +33,12 @@ class ImmutableMotorcycleTests extends FlatSpec {
   "Driving" should "cease when you run out of gas" in {
     val sceneResult = Scenarios.processScenesCumulative(
       SAM, JOE, CAR,
-      Movements(joe=Home, sam=Restaurant),
-      Movements(joe=Home, sam=School),
-      Movements(joe=Home, sam=Home),
-      Movements(joe=Home, sam=School),
-      Movements(joe=Home, sam=Home),
-      Movements(joe=School, sam=Home)
+      SceneUpdate(joe=Home, sam=Restaurant),
+      SceneUpdate(joe=Home, sam=School),
+      SceneUpdate(joe=Home, sam=Home),
+      SceneUpdate(joe=Home, sam=School),
+      SceneUpdate(joe=Home, sam=Home),
+      SceneUpdate(joe=School, sam=Home)
     )
 
     pprint.pprintln(sceneResult)
@@ -48,12 +48,12 @@ class ImmutableMotorcycleTests extends FlatSpec {
   "Driving" should "cease when you run out of gas, but preserve last state" in {
     val sceneResult = Scenarios.processScenesKeepLastGoodState(
       SAM, JOE, CAR,
-      Movements(joe=Home, sam=Restaurant),
-      Movements(joe=Home, sam=School),
-      Movements(joe=Home, sam=Home),
-      Movements(joe=Home, sam=School),
-      Movements(joe=Home, sam=Home),
-      Movements(joe=School, sam=Home)
+      SceneUpdate(joe=Home, sam=Restaurant),
+      SceneUpdate(joe=Home, sam=School),
+      SceneUpdate(joe=Home, sam=Home),
+      SceneUpdate(joe=Home, sam=School),
+      SceneUpdate(joe=Home, sam=Home),
+      SceneUpdate(joe=School, sam=Home)
     )
 
     pprint.pprintln(sceneResult)
@@ -66,20 +66,53 @@ class ImmutableMotorcycleTests extends FlatSpec {
   "Driving" should "utilize the builder pattern" in {
     val sceneResult = Scenarios.processMovements(
       SAM, JOE, CAR,
-      Movements(joe=Home, sam=Restaurant),
-      Movements(joe=Home, sam=School),
-      Movements(joe=Home, sam=Home),
-      Movements(joe=Home, sam=School),
-      Movements(joe=Home, sam=Home),
-      Movements(joe=School, sam=Home)
+      SceneUpdate(joe=Home, sam=Restaurant),
+      SceneUpdate(joe=Home, sam=School),
+      SceneUpdate(joe=Home, sam=Home),
+      SceneUpdate(joe=Home, sam=School),
+      SceneUpdate(joe=Home, sam=Home),
+      SceneUpdate(joe=School, sam=Home)
     )
 
     assert(sceneResult.isFailure)
   }
 
+//  "Driving" should "should be accomplished with scenes" in {
+//    val startScene = Scene(SAM, JOE, CAR)
+//    val sceneResult = Scenarios.processScenesFaultTolerantTyped(
+//      startScene,
+//      SceneUpdate(joe=Home, sam=Restaurant),
+//      SceneUpdate(joe=Home, sam=School),
+//      SceneUpdate(joe=Home, sam=Home),
+//      SceneUpdate(joe=Home, sam=School),
+//      SceneUpdate(joe=Home, sam=Home),
+//      SceneUpdate(joe=School, sam=Home)
+//    )
+//
+//    pprint.pprintln(sceneResult)
+//  }
+
+  "Driving" should "handle failures and apply valid movements as possible" in {
+    val startScene = Scene(SAM, JOE, CAR)
+    val sceneResult = Scenarios.processScenesFaultTolerantTyped(
+      startScene,
+      SceneUpdate(joe=School, sam=Restaurant), // Fail - Diverging locations
+      SceneUpdate(joe=Home, sam=School),
+      SceneUpdate(joe=Home, sam=Home),
+      SceneUpdate(joe=School, sam=Restaurant), // Fail - Diverging locations
+      SceneUpdate(joe=Home, sam=School),
+      SceneUpdate(joe=Home, sam=Home),
+      SceneUpdate(joe=Home, sam=School),
+      SceneUpdate(joe=Home, sam=Home),
+      SceneUpdate(joe=School, sam=Home)
+    )
+
+    pprint.pprintln(sceneResult)
+  }
+
   "A car" should "should always have fuel after fuel check." in {
     assert(CAR.fuel == 100)
-    PersonFunctions.drive(SAM, CAR, Restaurant) // Does nothing, since the result is ignored
+    TravelFunctions.drive(SAM, CAR, Restaurant) // Does nothing, since the result is ignored
     assert(CAR.fuel == 100)
   }
 
