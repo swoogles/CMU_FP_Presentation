@@ -1,9 +1,6 @@
 package mutable
 
-sealed trait Location
-object School extends Location
-object Home extends Location
-object Restaurant extends Location
+import functionalpresentation.Location
 
 case class Motorcycle(var fuel: Int, var location: Location) {
   val tripCost = 20

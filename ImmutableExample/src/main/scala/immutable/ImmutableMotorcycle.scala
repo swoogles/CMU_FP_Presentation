@@ -1,11 +1,8 @@
 package immutable
 
-import scala.util.{Failure, Success, Try}
+import functionalpresentation.Location
 
-sealed trait Location
-case object School extends Location
-case object Home extends Location
-case object Restaurant extends Location
+import scala.util.{Failure, Success, Try}
 
 case class Motorcycle(fuel: Int, location: Location)
 case class Person(name: String, location: Location)

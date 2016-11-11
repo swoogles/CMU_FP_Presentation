@@ -1,6 +1,10 @@
 package immutable
 
 import org.scalatest.FlatSpec
+import functionalpresentation.Location
+import functionalpresentation.Home
+import functionalpresentation.Restaurant
+import functionalpresentation.School
 
 import scala.util.Try
 import pprint.Config
