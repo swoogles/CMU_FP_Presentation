@@ -44,28 +44,35 @@ object TravelFunctions {
 object Scenarios {
 
   def updateScene(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: SceneUpdate)
-    : Try[(Person, Person, Motorcycle)] = {
+  : Try[(Person, Person, Motorcycle)] = {
     for ((newJoe, newCar) <- TravelFunctions.drive(joe, motorcycle, intentions.joe);
          (newSam, finalCar) <- TravelFunctions.drive(sam, newCar, intentions.sam) ) yield {
       (newJoe, newSam, finalCar)
     }
   }
 
+  private def coherentResult(vehicle1: Motorcycle, vehicle2: Motorcycle, joe: Person, sam: Person): Try[Scene] =
+    vehicle1 match {
+      case `vehicle2` => Success(Scene(joe, sam, vehicle1))
+      case conflictingCar => Failure(new Exception("Final car positions don't agree!"))
+    }
+
   def updateSceneTyped(scene: Scene, intentions: SceneUpdate)
   : Try[Scene] = {
     for ((newJoe, newCar) <- TravelFunctions.drive(scene.joe, scene.motorcycle, intentions.joe);
-         (newSam, finalCar) <- TravelFunctions.drive(scene.sam, newCar, intentions.sam) ) yield {
-      // Consider passing scene.motorcycle to both drive calls, and then check for equality to validate moves.
-      Scene(newJoe, newSam, finalCar)
+         (newSam, finalCar) <- TravelFunctions.drive(scene.sam, newCar, intentions.sam);
+         coherentScene <- coherentResult(newCar, finalCar, newJoe, newSam)
+    ) yield {
+      coherentScene
     }
   }
 
   def processMovements(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: SceneUpdate*)
-    : Try[(Person, Person, Motorcycle)] =
+  : Try[(Person, Person, Motorcycle)] =
     processMovements(joe, sam, motorcycle, intentions.toList)
 
   def processMovements(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: List[SceneUpdate])
-    : Try[(Person, Person, Motorcycle)] = {
+  : Try[(Person, Person, Motorcycle)] = {
     intentions.foldLeft(Try((joe, sam, motorcycle))) {
       case (Success((curJoe, curSam, curMotorcycle)), curIntentions) => updateScene(curJoe, curSam, curMotorcycle, curIntentions)
       case (Failure(ex), curIntentions) => Failure(ex)
@@ -73,11 +80,11 @@ object Scenarios {
   }
 
   def processScenesCumulative(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: SceneUpdate*)
-    : List[Try[(Person, Person, Motorcycle)]] =
+  : List[Try[(Person, Person, Motorcycle)]] =
     processScenesCumulative(joe, sam, motorcycle, intentions.toList)
 
   def processScenesCumulative(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: List[SceneUpdate])
-    : List[Try[(Person, Person, Motorcycle)]] = {
+  : List[Try[(Person, Person, Motorcycle)]] = {
     intentions.scanLeft(Try((joe, sam, motorcycle))) {
       case (Success((curJoe, curSam, curMotorcycle)), curIntentions) => updateScene(curJoe, curSam, curMotorcycle, curIntentions)
       case (Failure(ex), curIntentions) => Failure(ex)
@@ -85,11 +92,11 @@ object Scenarios {
   }
 
   def processScenesKeepLastGoodState(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: SceneUpdate*)
-    : Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] =
+  : Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] =
     processScenesKeepLastGoodState(joe, sam, motorcycle, intentions.toList)
 
   def processScenesKeepLastGoodState(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: List[SceneUpdate])
-    : Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] = {
+  : Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] = {
     val startState: Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] = Right((joe, sam, motorcycle))
     intentions.foldLeft(startState) {
       case (Right((curJoe, curSam, curMotorcycle)), curIntentions) => {

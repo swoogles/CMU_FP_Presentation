@@ -1,10 +1,7 @@
 package mutable
 
+import functionalpresentation.{Home, Restaurant, School}
 import org.scalatest.{Assertion, FlatSpec}
-import functionalpresentation.Location
-import functionalpresentation.Home
-import functionalpresentation.Restaurant
-import functionalpresentation.School
 
 class MutableMotorcycleTests extends FlatSpec {
 
