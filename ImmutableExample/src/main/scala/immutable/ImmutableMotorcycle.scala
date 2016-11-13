@@ -61,33 +61,13 @@ object Scenarios {
   : Try[Scene] = {
     for ((newJoe, newCar) <- TravelFunctions.drive(scene.joe, scene.motorcycle, intentions.joe);
          (newSam, finalCar) <- TravelFunctions.drive(scene.sam, newCar, intentions.sam);
-         coherentScene <- coherentResult(newCar, finalCar, newJoe, newSam)
+         coherentScene <-
+           if (scene.motorcycle != newCar)// Joe moved, so that means Sam better have moved to the same place.
+             coherentResult(newCar, finalCar, newJoe, newSam)
+           else
+             Success(Scene(newJoe, newSam, finalCar))
     ) yield {
       coherentScene
-    }
-  }
-
-  def processMovements(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: SceneUpdate*)
-  : Try[(Person, Person, Motorcycle)] =
-    processMovements(joe, sam, motorcycle, intentions.toList)
-
-  def processMovements(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: List[SceneUpdate])
-  : Try[(Person, Person, Motorcycle)] = {
-    intentions.foldLeft(Try((joe, sam, motorcycle))) {
-      case (Success((curJoe, curSam, curMotorcycle)), curIntentions) => updateScene(curJoe, curSam, curMotorcycle, curIntentions)
-      case (Failure(ex), curIntentions) => Failure(ex)
-    }
-  }
-
-  def processScenesCumulative(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: SceneUpdate*)
-  : List[Try[(Person, Person, Motorcycle)]] =
-    processScenesCumulative(joe, sam, motorcycle, intentions.toList)
-
-  def processScenesCumulative(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: List[SceneUpdate])
-  : List[Try[(Person, Person, Motorcycle)]] = {
-    intentions.scanLeft(Try((joe, sam, motorcycle))) {
-      case (Success((curJoe, curSam, curMotorcycle)), curIntentions) => updateScene(curJoe, curSam, curMotorcycle, curIntentions)
-      case (Failure(ex), curIntentions) => Failure(ex)
     }
   }
 
@@ -112,19 +92,27 @@ object Scenarios {
 
 
 
-  def processScenesTyped(scene: Scene, intentions: List[SceneUpdate]) : Try[Scene] = {
-    intentions.foldLeft(Try(scene)) {
-      case (Success(curScene), curIntentions) => updateSceneTyped(curScene, curIntentions)
+  // TODO Find more use cases for this. I'm glad I managed to extract the duplicate code from processScenesType and
+  // processScenesTypedCumulative, but it'd really start to shine if I can get 1 or 2 more useful variations.
+  private val sceneUpdateCases = { (curScene: Try[Scene], update: SceneUpdate) =>
+      (curScene, update) match {
+      case (Success(curScene: Scene), curIntentions) => updateSceneTyped(curScene, curIntentions)
       case (Failure(ex), curIntentions) => Failure(ex)
     }
   }
 
-  def processScenesCumulativeTyped(scene: Scene, intentions: List[SceneUpdate]) : List[Try[Scene]] = {
-    intentions.scanLeft(Try(scene)) {
-      case (Success(curScene), curIntentions) => updateSceneTyped(curScene, curIntentions)
-      case (Failure(ex), curIntentions) => Failure(ex)
-    }
-  }
+  def processScenesTyped(scene: Scene, intentions: SceneUpdate*) : Try[Scene] =
+    processScenesTyped(scene, intentions.toList)
+
+
+  def processScenesTyped(scene: Scene, intentions: List[SceneUpdate]) : Try[Scene] =
+    intentions.foldLeft(Try(scene))(sceneUpdateCases)
+
+  def processScenesCumulativeTyped(scene: Scene, intentions: SceneUpdate*) : List[Try[Scene]] =
+    processScenesCumulativeTyped(scene, intentions.toList)
+
+  def processScenesCumulativeTyped(scene: Scene, intentions: List[SceneUpdate]) : List[Try[Scene]] =
+    intentions.scanLeft(Try(scene))(sceneUpdateCases)
 
   case class SceneWithFailedMoves(scene: Scene, failedMoves: List[(Scene, SceneUpdate, Throwable)])
 
