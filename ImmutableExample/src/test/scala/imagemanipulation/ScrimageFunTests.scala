@@ -1,9 +1,9 @@
 package imagemanipulation
 
 import functionalpresentation.{Home, Restaurant, School}
+import immutable.GitOperations
 import org.scalatest.FlatSpec
 
-import pprint.Config
 import scala.util.Try
 
 /**
@@ -20,7 +20,14 @@ class ScrimageFunTests extends FlatSpec {
       "lets keep makin em!",
       "more and more and more text!"
     )
-    ScrimageFun.makeImgFromText(content)
+//    ScrimageFun.makeImgFromText(content)
+  }
+
+  "scrimage" should "create images for every step" in {
+
+    val fullHistory = GitOperations.completeHistory(immutable.git.GitDemoData.allCommitsInOrder)
+    ScrimageFun.makeImgsFromHistory(fullHistory)
+
   }
 
 }

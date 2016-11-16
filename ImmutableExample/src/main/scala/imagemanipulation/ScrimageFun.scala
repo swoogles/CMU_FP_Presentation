@@ -30,6 +30,7 @@ object ScrimageFun {
   val originalImgDir = ammonite.ops.pwd / up / 'OriginalImages
   val listed = ls! originalImgDir
   val manipulatedImgDir = cwd / up / 'ManipulatedImages
+  val generatedImgDir = cwd / up / 'GeneratedImages
 
   def copyFreshImages_!(srcDir: Path, targetDir: Path): LsSeq = {
     val oldImages = ls! targetDir
@@ -39,7 +40,15 @@ object ScrimageFun {
     ls! targetDir
   }
 
-  val imgFont = new JFont("Sans-seriff", 1, 36)
+  def generateFreshImages_!(targetDir: Path) = {
+    mkdir! targetDir
+    val oldImages = ls! targetDir
+    oldImages.map{ rm! _ }
+//    for ( file <- (ls! srcDir) ) { cp.into(file, targetDir)  }
+//    ls! targetDir
+  }
+
+  val imgFont = new JFont("Sans-seriff", 1, 28)
 
   val imgTextNew =
     Text("Happy Holidays!", 200, 800-20, { g2 =>
@@ -49,7 +58,7 @@ object ScrimageFun {
 
   def makeTextDrawable(content: List[String]) = {
     content.zipWithIndex.map { case (lineContent, lineIdx) =>
-      Text(lineContent, 200, 100 + (lineIdx * 30), { g2 =>
+      Text(lineContent, 20, 100 + (lineIdx * 30), { g2 =>
         g2.setBackground(JColor.WHITE)
         g2.setFont(imgFont)
       })
@@ -113,23 +122,24 @@ object ScrimageFun {
     ) { img.output(imgPath.toIO)(JpegWriter())}
   }
 
-  def makeImgFromText(content: List[String]) = {
-    println("Going to draw: ")
-    println(content.mkString("\n"))
+  def makeImgsFromHistory(history: List[List[String]]) = {
+    for ((curRevision, idx) <- history.zipWithIndex) {
+
+      makeImgFromText(curRevision, idx)
+
+    }
+
+  }
+
+  def makeImgFromText(content: List[String], sequenceIdx: Int = 0) = {
     val drawableText = makeTextDrawable(content)
-    for (imgPath <- copyFreshImages_!(originalImgDir, manipulatedImgDir);
-         img: Canvas = Image(800, 600)
-           .fit(800, 600, Color.Black)
-           .pad(100, Color.Black)
-    ) {
-      val imgWith1Line = img.draw(drawableText(0))
-      val imgWith2Line = imgWith1Line.draw(drawableText(1))
-      val imgWith3Line = imgWith2Line.draw(drawableText(2))
-
-      val imgWithText: Canvas = drawableText.foldLeft(img){
-        case (curImg: Canvas, nextText: Text) => curImg.draw(nextText)
-      }
-
-      imgWithText.output(imgPath.toIO)(JpegWriter())}
+    val img: Canvas = Image(800, 600)
+      .fit(800, 600, Color.Black)
+      .pad(100, Color.Black)
+    val imgPath = generatedImgDir / (s"commit_${sequenceIdx}_.jpg")
+    val imgWithText: Canvas = drawableText.foldLeft(img){
+      case (curImg: Canvas, nextText: Text) => curImg.draw(nextText)
+    }
+    imgWithText.output(imgPath.toIO)(JpegWriter())
   }
 }
