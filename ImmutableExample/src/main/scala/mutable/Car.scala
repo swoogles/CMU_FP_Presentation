@@ -2,7 +2,7 @@ package mutable
 
 import functionalpresentation.Location
 
-case class Motorcycle(var fuel: Int, var location: Location) {
+case class Car(var fuel: Int, var location: Location) {
   val tripCost = 20
   def drive(destination: Location): Unit = {
     if (this.fuel < tripCost)
@@ -15,18 +15,18 @@ case class Motorcycle(var fuel: Int, var location: Location) {
 case class Person(var name: String, var location: Location) {
 
   // Spot the bug in this method!
-  def drive(motorcycle: Motorcycle, destination: Location): Unit = {
-    if(this.location != motorcycle.location) {
+  def drive(car: Car, destination: Location): Unit = {
+    if(this.location != car.location) {
       throw new Exception("Car and driver aren't in the same place!") // Abort!
     }
     this.location = destination
-    motorcycle.drive(destination)
+    car.drive(destination)
   }
 
-  def fill(motorcycle: Motorcycle): Unit = {
-    if(this.location != motorcycle.location) {
+  def fill(car: Car): Unit = {
+    if(this.location != car.location) {
       throw new Exception("Car and driver aren't in the same place!") // Abort!
     }
-    motorcycle.fuel = 100
+    car.fuel = 100
   }
 }

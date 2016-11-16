@@ -3,11 +3,11 @@ package mutable
 import functionalpresentation.{Home, Restaurant, School}
 import org.scalatest.{Assertion, FlatSpec}
 
-class MutableMotorcycleTests extends FlatSpec {
+class MutableCarTests extends FlatSpec {
 
   var sam = Person("Sam", Home)
   var joe = Person("Joe", Home)
-  var car = Motorcycle(100, Home)
+  var car = Car(100, Home)
 
   "Driving" should "cease when you run out of gas" in {
     assertThrows[Exception] {

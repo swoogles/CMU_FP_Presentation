@@ -6,12 +6,12 @@ import org.scalatest.FlatSpec
 import pprint.Config
 import scala.util.Try
 
-class ImmutableMotorcycleTests extends FlatSpec {
+class ImmutableCarTests extends FlatSpec {
   implicit val pprintConfig = Config()
 
   val SAM = Person("Sam", Home)
   val JOE = Person("Joe", Home)
-  val CAR = Motorcycle(100, Home)
+  val CAR = Car(100, Home)
   val SCENE = Scene(JOE, SAM, CAR)
 
   "Driving" should "not be possible if you aren't with the car" in {

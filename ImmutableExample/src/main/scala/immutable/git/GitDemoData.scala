@@ -17,7 +17,7 @@ object GitDemoData {
 
   val addMutableDataClasses = BranchCommit(
     List(
-      (2, "case class Motorcycle(var fuel: Int, var location: Location)"),
+      (2, "case class Car(var fuel: Int, var location: Location)"),
       (3, "case class Person(var name: String, var location: Location)"),
       (4, "")
     ),
@@ -27,7 +27,7 @@ object GitDemoData {
 
   val addImmutableDataClasses = BranchCommit(
     List(
-      (2, "case class Motorcycle(fuel: Int, location: Location)"),
+      (2, "case class Car(fuel: Int, location: Location)"),
       (3, "case class Person(name: String, location: Location)"),
       (4, "")
     ),
@@ -47,17 +47,32 @@ object GitDemoData {
     addImmutableDataClasses
   )
 
-  val addMotorcycleFunctions = BranchCommit(
+  val addCarStubs = BranchCommit(
     List(
       (1, ""),
       (2, "import scala.util.{Failure, Success, Try}"),
-      (12, "object MotorcycleFunctions {"),
+      (12, "object TravelFunctions {"),
       (13, "  val tripCost = 20"),
       (14, ""),
-      (15, "  def drive(motorcycle: Motorcycle, destination: Location): Try[Motorcycle] = {"),
-      (16, "    motorcycle match {"),
-      (17, "      case Motorcycle(_, location) if (location == destination) => Success(motorcycle)"),
-      (18, "      case Motorcycle(fuel, _) if (fuel >= tripCost) => Success(Motorcycle(motorcycle.fuel - tripCost, destination))"),
+      (15, "  def drive(car: Car, destination: Location): Try[Car] = ???"),
+      (21, "  }"),
+      (22, "}")
+    ),
+    List(),
+    addImmutableDataClasses
+  )
+
+  val addCarFunctions = BranchCommit(
+    List(
+      (1, ""),
+      (2, "import scala.util.{Failure, Success, Try}"),
+      (12, "object CarFunctions {"),
+      (13, "  val tripCost = 20"),
+      (14, ""),
+      (15, "  def drive(car: Car, destination: Location): Try[Car] = {"),
+      (16, "    car match {"),
+      (17, "      case Car(_, location) if (location == destination) => Success(car)"),
+      (18, "      case Car(fuel, _) if (fuel >= tripCost) => Success(Car(car.fuel - tripCost, destination))"),
       (19, "      case _ => Failure(new Exception(\"Ran out of gas!\"))"),
       (20, "    }"),
       (21, "  }"),
@@ -72,6 +87,6 @@ object GitDemoData {
     addMutableDataClasses,
     addImmutableDataClasses,
     addLocations,
-    addMotorcycleFunctions
+    addCarFunctions
   )
 }

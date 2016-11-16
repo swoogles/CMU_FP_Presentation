@@ -4,54 +4,54 @@ import functionalpresentation.Location
 
 import scala.util.{Failure, Success, Try}
 
-case class Motorcycle(fuel: Int, location: Location)
+case class Car(fuel: Int, location: Location)
 case class Person(name: String, location: Location)
 // Figure out how to accomodate filling the car in here.
 // Otherwise it's not a true alternative to the OO approach.
 case class SceneUpdate(joe: Location, sam: Location)
 
-case class Scene(joe: Person, sam: Person, motorcycle: Motorcycle)
+case class Scene(joe: Person, sam: Person, car: Car)
 
 object TravelFunctions {
   val tripCost = 20
 
-  def drive(motorcycle: Motorcycle, destination: Location): Try[Motorcycle] = {
-    motorcycle match {
-      case Motorcycle(_, location) if (location == destination) => Success(motorcycle)
-      case Motorcycle(fuel, _) if (fuel >= tripCost) => Success(Motorcycle(motorcycle.fuel - tripCost, destination))
+  private def drive(car: Car, destination: Location): Try[Car] = {
+    car match {
+      case Car(_, location) if (location == destination) => Success(car)
+      case Car(fuel, _) if (fuel >= tripCost) => Success(Car(car.fuel - tripCost, destination))
       case _ => Failure(new Exception("Ran out of gas!"))
     }
   }
 
-  def drive(person: Person, motorcycle: Motorcycle, destination: Location): Try[(Person, Motorcycle)] = {
+  def drive(person: Person, car: Car, destination: Location): Try[(Person, Car)] = {
     person.location match {
-      case `destination` => Success((person, motorcycle)) // Try to ignore the backticks
-      case motorcycle.location =>
-        TravelFunctions.drive(motorcycle, destination) flatMap { movedCar =>
+      case `destination` => Success((person, car)) // Try to ignore the backticks
+      case car.location =>
+        TravelFunctions.drive(car, destination) flatMap { movedCar =>
           Success((person.copy(location = destination), movedCar))
         }
       case invalidLocation => Failure(new Exception("Car and driver aren't in the same place!"))
     }
   }
 
-  def fill(person: Person, motorcycle: Motorcycle): Try[Motorcycle] =
+  def fill(person: Person, car: Car): Try[Car] =
     person.location match {
-      case motorcycle.location => Success(motorcycle.copy(fuel = 100))
+      case car.location => Success(car.copy(fuel = 100))
       case _ => Failure(new Exception("Car and driver aren't in the same place!"))
     }
 }
 
 object Scenarios {
 
-  def updateScene(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: SceneUpdate)
-  : Try[(Person, Person, Motorcycle)] = {
-    for ((newJoe, newCar) <- TravelFunctions.drive(joe, motorcycle, intentions.joe);
+  def updateScene(joe: Person, sam: Person, car: Car, intentions: SceneUpdate)
+  : Try[(Person, Person, Car)] = {
+    for ((newJoe, newCar) <- TravelFunctions.drive(joe, car, intentions.joe);
          (newSam, finalCar) <- TravelFunctions.drive(sam, newCar, intentions.sam) ) yield {
       (newJoe, newSam, finalCar)
     }
   }
 
-  private def coherentResult(vehicle1: Motorcycle, vehicle2: Motorcycle, joe: Person, sam: Person): Try[Scene] =
+  private def coherentResult(vehicle1: Car, vehicle2: Car, joe: Person, sam: Person): Try[Scene] =
     vehicle1 match {
       case `vehicle2` => Success(Scene(joe, sam, vehicle1))
       case conflictingCar => Failure(new Exception("Final car positions don't agree!"))
@@ -59,25 +59,26 @@ object Scenarios {
 
   def updateSceneTyped(scene: Scene, intentions: SceneUpdate)
   : Try[Scene] = {
-    for ((newJoe, newCar) <- TravelFunctions.drive(scene.joe, scene.motorcycle, intentions.joe);
-         (newSam, finalCar) <- TravelFunctions.drive(scene.sam, newCar, intentions.sam);
+    for ((newJoe, joeCarResult) <- TravelFunctions.drive(scene.joe, scene.car, intentions.joe);
+         (newSam, samCarResult) <- TravelFunctions.drive(scene.sam, scene.car, intentions.sam);
          coherentScene <-
-           if (scene.motorcycle != newCar)// Joe moved, so that means Sam better have moved to the same place.
-             coherentResult(newCar, finalCar, newJoe, newSam)
+           if (joeCarResult == samCarResult)// Joe moved, so that means Sam better have moved to the same place.
+             Success(Scene(newJoe, newSam, samCarResult))
            else
-             Success(Scene(newJoe, newSam, finalCar))
+             Failure(new Exception("Final car positions don't agree!"))
+
     ) yield {
       coherentScene
     }
   }
 
-  def processScenesKeepLastGoodState(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: SceneUpdate*)
-  : Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] =
+  def processScenesKeepLastGoodState(joe: Person, sam: Person, motorcycle: Car, intentions: SceneUpdate*)
+  : Either[(Throwable, (Person, Person, Car)),(Person, Person, Car)] =
     processScenesKeepLastGoodState(joe, sam, motorcycle, intentions.toList)
 
-  def processScenesKeepLastGoodState(joe: Person, sam: Person, motorcycle: Motorcycle, intentions: List[SceneUpdate])
-  : Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] = {
-    val startState: Either[(Throwable, (Person, Person, Motorcycle)),(Person, Person, Motorcycle)] = Right((joe, sam, motorcycle))
+  def processScenesKeepLastGoodState(joe: Person, sam: Person, motorcycle: Car, intentions: List[SceneUpdate])
+  : Either[(Throwable, (Person, Person, Car)),(Person, Person, Car)] = {
+    val startState: Either[(Throwable, (Person, Person, Car)),(Person, Person, Car)] = Right((joe, sam, motorcycle))
     intentions.foldLeft(startState) {
       case (Right((curJoe, curSam, curMotorcycle)), curIntentions) => {
         updateScene(curJoe, curSam, curMotorcycle, curIntentions) match {
