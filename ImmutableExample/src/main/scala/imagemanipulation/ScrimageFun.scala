@@ -126,10 +126,10 @@ object ScrimageFun {
       val imgWith2Line = imgWith1Line.draw(drawableText(1))
       val imgWith3Line = imgWith2Line.draw(drawableText(2))
 
-//      val imgWithText: Canvas = drawableText.fold(img){
-//        case (curImg: Canvas, nextText: Text) => curImg.draw(nextText)
-//      }
+      val imgWithText: Canvas = drawableText.foldLeft(img){
+        case (curImg: Canvas, nextText: Text) => curImg.draw(nextText)
+      }
 
-      imgWith3Line.output(imgPath.toIO)(JpegWriter())}
+      imgWithText.output(imgPath.toIO)(JpegWriter())}
   }
 }

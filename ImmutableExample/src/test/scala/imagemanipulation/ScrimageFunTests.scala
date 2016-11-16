@@ -16,7 +16,9 @@ class ScrimageFunTests extends FlatSpec {
     val content = List(
       "this is just a few",
       "random lines of text",
-      "that I want to draw on an image"
+      "that I want to draw on an image",
+      "lets keep makin em!",
+      "more and more and more text!"
     )
     ScrimageFun.makeImgFromText(content)
   }
