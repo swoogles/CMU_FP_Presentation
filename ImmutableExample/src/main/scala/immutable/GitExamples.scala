@@ -8,8 +8,14 @@ sealed trait GitObject {
 case class LeafCommit(linesAdded: List[(Int, String)], linesRemoved: List[Int]) extends GitObject
 case class BranchCommit(linesAdded: List[(Int, String)], linesRemoved: List[Int], prevCommit: GitObject) extends GitObject
 
-object GitOperations {
-  def updateContent(contentSoFar: List[String], nextCommit: GitObject) = {
+trait GitBehavior {
+  def updateContent(contentSoFar: List[String], nextCommit: GitObject): List[String]
+  def completeHistory(history: List[GitObject]): List[List[String]]
+  def content(obj: GitObject): List[String]
+}
+
+object GitOperations extends GitBehavior {
+  def updateContent(contentSoFar: List[String], nextCommit: GitObject): List[String] = {
 
     val contentWithLinesRemoved: List[String] = nextCommit.linesRemoved.reverse.foldLeft(contentSoFar) {
       (innerContentSoFar, lineToRemove) => innerContentSoFar.take(lineToRemove) ++ innerContentSoFar.drop(lineToRemove + 1)
