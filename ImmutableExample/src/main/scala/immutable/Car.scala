@@ -6,28 +6,32 @@ import scala.util.{Failure, Success, Try}
 
 case class Car(fuel: Int, location: Location)
 case class Person(name: String, location: Location)
-// Figure out how to accomodate filling the car in here.
-// Otherwise it's not a true alternative to the OO approach.
-case class SceneUpdate(joe: Location, sam: Location)
 
 case class Scene(joe: Person, sam: Person, car: Car)
+case class SceneUpdate(joe: Location, sam: Location)
 
 object TravelFunctions {
   val tripCost = 20
 
-  private def drive(car: Car, destination: Location): Try[Car] = {
+  private def move(car: Car, destination: Location): Try[Car] = {
     car match {
-      case Car(_, location) if (location == destination) => Success(car)
-      case Car(fuel, _) if (fuel >= tripCost) => Success(Car(car.fuel - tripCost, destination))
-      case _ => Failure(new Exception("Ran out of gas!"))
+//      case Car(_, location) if (location == destination) => Success(car)
+      case car: Car if (car.location == destination) => Success(car)
+
+        // TODO convert these to non-deconstructing
+//      case Car(fuel, _) if (fuel >= tripCost) => Success(Car(car.fuel - tripCost, destination))
+      case Car(fuel, _) if (fuel >= tripCost) => Success(car.copy(fuel= fuel - tripCost, location=destination))
+
+      case _ => Failure(new Exception("Can't complete the trip!"))
     }
   }
 
   def drive(person: Person, car: Car, destination: Location): Try[(Person, Car)] = {
+
     person.location match {
-      case `destination` => Success((person, car)) // Try to ignore the backticks
+      case `destination` => Success((person, car)) // Try to ignore the backticks. Matches the value of destination rather than matching anything and sticking it in a val called destination
       case car.location =>
-        TravelFunctions.drive(car, destination) flatMap { movedCar =>
+        TravelFunctions.move(car, destination) flatMap { movedCar =>
           Success((person.copy(location = destination), movedCar))
         }
       case invalidLocation => Failure(new Exception("Car and driver aren't in the same place!"))
@@ -51,21 +55,24 @@ object Scenarios {
     }
   }
 
-  private def coherentResult(vehicle1: Car, vehicle2: Car, joe: Person, sam: Person): Try[Scene] =
-    vehicle1 match {
-      case `vehicle2` => Success(Scene(joe, sam, vehicle1))
-      case conflictingCar => Failure(new Exception("Final car positions don't agree!"))
-    }
-
   def updateSceneTyped(scene: Scene, intentions: SceneUpdate)
   : Try[Scene] = {
     for ((newJoe, joeCarResult) <- TravelFunctions.drive(scene.joe, scene.car, intentions.joe);
+
          (newSam, samCarResult) <- TravelFunctions.drive(scene.sam, scene.car, intentions.sam);
-         coherentScene <-
-           if (joeCarResult == samCarResult)// Joe moved, so that means Sam better have moved to the same place.
+         coherentScene <- {
+           if (joeCarResult != scene.car && samCarResult != scene.car) {
+             if ( joeCarResult == samCarResult )
+               Success(Scene(newJoe, newSam, samCarResult))
+             else
+               Failure(new Exception("Final car positions don't agree!"))
+           } else if (joeCarResult != scene.car) {
+             Success(Scene(newJoe, newSam, joeCarResult))
+           } else {
              Success(Scene(newJoe, newSam, samCarResult))
-           else
-             Failure(new Exception("Final car positions don't agree!"))
+           }
+
+         }
 
     ) yield {
       coherentScene
