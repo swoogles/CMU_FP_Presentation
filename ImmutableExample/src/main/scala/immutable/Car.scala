@@ -15,24 +15,24 @@ trait TravelBehavior {
   def fill(person: Person, car: Car): Try[Car]
 }
 
+trait ScenarioActions {
+  def updateScene(scene: Scene, intentions: SceneUpdate) : Try[Scene]
+  def processScenes(scene: Scene, intentions: List[SceneUpdate]) : Try[Scene]
+  def processScenesCumulative(scene: Scene, intentions: List[SceneUpdate]) : List[Try[Scene]]
+  def processScenesKeepLastGoodState(scene: Scene, intentions: List[SceneUpdate]) : Either[(Throwable, Scene), Scene]
+}
+
 object TravelFunctions extends TravelBehavior {
   val tripCost = 20
 
-  private def move(car: Car, destination: Location): Try[Car] = {
+  private def move(car: Car, destination: Location): Try[Car] =
     car match {
-//      case Car(_, location) if (location == destination) => Success(car)
-      case car: Car if (car.location == destination) => Success(car)
-
-        // TODO convert these to non-deconstructing
-//      case Car(fuel, _) if (fuel >= tripCost) => Success(Car(car.fuel - tripCost, destination))
-      case Car(fuel, _) if (fuel >= tripCost) => Success(car.copy(fuel= fuel - tripCost, location=destination))
-
-      case _ => Failure(new Exception("Not enough fuel for the trip!"))
+      case matchedCar: Car if (matchedCar.location == destination) => Success(matchedCar)
+      case matchedCar: Car if (matchedCar.fuel >= tripCost) => Success(matchedCar.copy(fuel= matchedCar.fuel - tripCost, location=destination))
+      case emptyCar => Failure(new Exception("Not enough fuel for the trip!"))
     }
-  }
 
-  def drive(person: Person, car: Car, destination: Location): Try[(Person, Car)] = {
-
+  def drive(person: Person, car: Car, destination: Location): Try[(Person, Car)] =
     person.location match {
       case `destination` => Success((person, car)) // Try to ignore the backticks. Matches the value of destination rather than matching anything and sticking it in a val called destination
       case car.location =>
@@ -41,19 +41,17 @@ object TravelFunctions extends TravelBehavior {
         }
       case invalidLocation => Failure(new Exception("Car and driver aren't in the same place!"))
     }
-  }
 
   def fill(person: Person, car: Car): Try[Car] =
     person.location match {
       case car.location => Success(car.copy(fuel = 100))
-      case _ => Failure(new Exception("Car and driver aren't in the same place!"))
+      case invalidLocation => Failure(new Exception("Car and driver aren't in the same place!"))
     }
 }
 
-object Scenarios {
+object Scenarios extends ScenarioActions {
 
-  def updateScene(scene: Scene, intentions: SceneUpdate)
-  : Try[Scene] = {
+  def updateScene(scene: Scene, intentions: SceneUpdate) : Try[Scene] =
     for ((newJoe, joeCarResult) <- TravelFunctions.drive(scene.joe, scene.car, intentions.joe);
          (newSam, samCarResult) <- TravelFunctions.drive(scene.sam, scene.car, intentions.sam);
          coherentScene <-
@@ -70,12 +68,11 @@ object Scenarios {
     ) yield {
       coherentScene
     }
-  }
 
   // TODO Find more use cases for this. I'm glad I managed to extract the duplicate code from processScenesType and
   // processScenesTypedCumulative, but it'd really start to shine if I can get 1 or 2 more useful variations.
   private val sceneUpdateCases = { (curScene: Try[Scene], update: SceneUpdate) =>
-      (curScene, update) match {
+    (curScene, update) match {
       case (Success(curScene: Scene), curIntentions) => updateScene(curScene, curIntentions)
       case (Failure(ex), curIntentions) => Failure(ex)
     }
@@ -83,7 +80,6 @@ object Scenarios {
 
   def processScenes(scene: Scene, intentions: SceneUpdate*) : Try[Scene] =
     processScenes(scene, intentions.toList)
-
 
   def processScenes(scene: Scene, intentions: List[SceneUpdate]) : Try[Scene] =
     intentions.foldLeft(Try(scene))(sceneUpdateCases)
@@ -98,7 +94,6 @@ object Scenarios {
 
   def processScenesFaultTolerant(scene: Scene, intentions: SceneUpdate*) : SceneWithFailedMoves =
     processScenesFaultTolerant(scene, intentions.toList)
-
 
   def processScenesFaultTolerant(scene: Scene, intentions: List[SceneUpdate]) : SceneWithFailedMoves = {
     val sceneWithReversedFailedMoves = intentions.foldLeft(SceneWithFailedMoves(scene, List())) {
@@ -115,8 +110,7 @@ object Scenarios {
 
   }
 
-  def processScenesKeepLastGoodStateScene(scene: Scene, intentions: SceneUpdate*)
-  : Either[(Throwable, Scene),Scene] =
+  def processScenesKeepLastGoodStateScene(scene: Scene, intentions: SceneUpdate*) : Either[(Throwable, Scene),Scene] =
     processScenesKeepLastGoodState(scene, intentions.toList)
 
   def processScenesKeepLastGoodState(scene: Scene, intentions: List[SceneUpdate]) : Either[(Throwable, Scene), Scene] = {

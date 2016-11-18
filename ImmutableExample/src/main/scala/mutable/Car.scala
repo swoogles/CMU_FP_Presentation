@@ -2,7 +2,16 @@ package mutable
 
 import functionalpresentation.Location
 
-case class Car(var fuel: Int, var location: Location) {
+trait Movable {
+  def move(destination: Location): Unit
+}
+
+trait Driver {
+  def drive(car: Car, destination: Location): Unit
+  def fill(car: Car): Unit
+}
+
+case class Car(var fuel: Int, var location: Location) extends Movable {
   val tripCost = 20
   def move(destination: Location): Unit = {
     if (this.fuel < tripCost)
@@ -12,7 +21,7 @@ case class Car(var fuel: Int, var location: Location) {
   }
 }
 
-case class Person(var name: String, var location: Location) {
+case class Person(var name: String, var location: Location) extends Driver {
 
   // Spot the bug in this method!
   def drive(car: Car, destination: Location): Unit = {
