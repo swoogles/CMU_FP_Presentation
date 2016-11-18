@@ -11,7 +11,7 @@ case class BranchCommit(linesAdded: List[(Int, String)], linesRemoved: List[Int]
 trait GitBehavior {
   def updateContent(contentSoFar: List[String], nextCommit: GitObject): List[String]
   def completeHistory(history: List[GitObject]): List[List[String]]
-  def content(obj: GitObject): List[String]
+  def content(obj: GitObject): List[String] // Show non-exhaustivity here.
 }
 
 object GitOperations extends GitBehavior {
@@ -28,12 +28,7 @@ object GitOperations extends GitBehavior {
     }
     contentWithLinesAdded
   }
-
-
   def completeHistory(history: List[GitObject]): List[List[String]] = {
-    history.scanLeft(List("")) { (content, nextCommit) =>
-      updateContent(content, nextCommit)
-    }
     history.scanLeft(List("")) { updateContent }
   }
 

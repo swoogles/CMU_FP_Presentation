@@ -9,6 +9,7 @@ trait Movable {
 trait Driver {
   def drive(car: Car, destination: Location): Unit
   def fill(car: Car): Unit
+  def clean(car: Car): Unit
 }
 
 case class Car(var fuel: Int, var location: Location) extends Movable {
@@ -37,5 +38,12 @@ case class Person(var name: String, var location: Location) extends Driver {
       throw new Exception("Car and driver aren't in the same place!") // Abort!
     }
     car.fuel = 100
+  }
+
+  def clean(car: Car): Unit = {
+    if(this.location != car.location) {
+      throw new Exception("Car and driver aren't in the same place!") // Abort!
+    }
+    car.fuel -= 10
   }
 }

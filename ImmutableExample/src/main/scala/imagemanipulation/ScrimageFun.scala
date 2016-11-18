@@ -58,7 +58,7 @@ object ScrimageFun {
 
   def makeTextDrawable(content: List[String]) = {
     content.zipWithIndex.map { case (lineContent, lineIdx) =>
-      Text(lineContent, 20, 100 + (lineIdx * 30), { g2 =>
+      Text(lineContent, 20, 30 + (lineIdx * 30), { g2 =>
         g2.setBackground(JColor.WHITE)
         g2.setFont(imgFont)
       })
@@ -122,19 +122,15 @@ object ScrimageFun {
     ) { img.output(imgPath.toIO)(JpegWriter())}
   }
 
-  def makeImgsFromHistory(history: List[List[String]]) = {
+  def makeImgsFromHistory(history: List[List[String]]) =
     for ((curRevision, idx) <- history.zipWithIndex) {
-
       makeImgFromText(curRevision, idx)
-
     }
-
-  }
 
   def makeImgFromText(content: List[String], sequenceIdx: Int = 0) = {
     val drawableText = makeTextDrawable(content)
-    val img: Canvas = Image(800, 600)
-      .fit(800, 600, Color.Black)
+    val img: Canvas = Image(1400, 800)
+      .fit(1400, 800, Color.Black)
       .pad(100, Color.Black)
     val imgPath = generatedImgDir / (s"commit_${sequenceIdx}_.jpg")
     val imgWithText: Canvas = drawableText.foldLeft(img){

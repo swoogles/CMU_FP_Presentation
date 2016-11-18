@@ -7,7 +7,15 @@ import scala.util.{Failure, Success, Try}
 case class Car(fuel: Int, location: Location)
 case class Person(name: String, location: Location)
 
-case class Scene(joe: Person, sam: Person, car: Car)
+case class Scene(joe: Person, sam: Person, car: Car) {
+  def update(intentions: SceneUpdate) : Scene =
+    Scenarios.updateScene(this, intentions) match {
+      case Success(scene) => scene
+      case Failure(ex) => this
+    }
+  def updateTry(intentions: SceneUpdate) : Try[Scene] =
+    Scenarios.updateScene(this, intentions)
+}
 case class SceneUpdate(joe: Location, sam: Location)
 
 trait TravelBehavior {
