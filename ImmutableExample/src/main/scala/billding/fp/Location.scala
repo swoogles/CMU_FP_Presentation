@@ -1,4 +1,4 @@
-package functionalpresentation
+package billding.fp
 
 sealed trait Location
 case object School extends Location

@@ -1,9 +1,10 @@
-package immutable
+package billding.fp.immutable
 
-import functionalpresentation.{Home, Restaurant, School}
+import billding.fp.{Home, Restaurant, School}
+// import functionalpresentation.{Home, Restaurant}
 import org.scalatest.FlatSpec
-
 import pprint.Config
+
 import scala.util.Try
 
 class ImmutableCarTests extends FlatSpec {

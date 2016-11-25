@@ -1,6 +1,6 @@
-package immutable
+package billding.fp.immutable
 
-import functionalpresentation.Location
+import billding.fp.Location
 
 import scala.util.{Failure, Success, Try}
 
@@ -17,6 +17,19 @@ case class Scene(joe: Person, sam: Person, car: Car) {
     Scenarios.updateScene(this, intentions)
 }
 case class SceneUpdate(joe: Location, sam: Location)
+
+sealed trait BetterSceneUpdate {
+  val time: Int
+}
+case object Refuel extends BetterSceneUpdate {
+  val time = 1
+}
+case object Wait extends BetterSceneUpdate {
+  val time = 2
+}
+case class Travel(joe: Location, sam: Location) extends BetterSceneUpdate {
+  val time = 5
+}
 
 trait TravelBehavior {
   def drive(person: Person, car: Car, destination: Location): Try[(Person, Car)]
@@ -77,11 +90,43 @@ object Scenarios extends ScenarioActions {
       coherentScene
     }
 
+  def updateSceneImp(scene: Scene, update: BetterSceneUpdate) : Try[Scene] =
+    update match {
+      case intentions: Travel =>
+        for ((newJoe, joeCarResult) <- TravelFunctions.drive(scene.joe, scene.car, intentions.joe);
+             (newSam, samCarResult) <- TravelFunctions.drive(scene.sam, scene.car, intentions.sam);
+             coherentScene <-
+               if (joeCarResult != scene.car && samCarResult != scene.car) {
+                 if ( joeCarResult == samCarResult )
+                   Success(Scene(newJoe, newSam, samCarResult))
+                 else
+                   Failure(new Exception("Final car positions don't agree!"))
+               } else if (joeCarResult != scene.car) {
+                   Success(Scene(newJoe, newSam, joeCarResult))
+               } else {
+                   Success(Scene(newJoe, newSam, samCarResult))
+               }
+        ) yield {
+          coherentScene
+        }
+      case Wait => Success(scene)
+      case Refuel =>
+        val filledCar = scene.car.copy(fuel=100)
+        Success(scene.copy(car = filledCar))
+    }
+
   // TODO Find more use cases for this. I'm glad I managed to extract the duplicate code from processScenesType and
   // processScenesTypedCumulative, but it'd really start to shine if I can get 1 or 2 more useful variations.
   private val sceneUpdateCases = { (curScene: Try[Scene], update: SceneUpdate) =>
     (curScene, update) match {
       case (Success(curScene: Scene), curIntentions) => updateScene(curScene, curIntentions)
+      case (Failure(ex), curIntentions) => Failure(ex)
+    }
+  }
+
+  private val sceneUpdateCasesImp = { (curScene: Try[Scene], update: BetterSceneUpdate) =>
+    (curScene, update) match {
+      case (Success(curScene: Scene), curIntentions) => updateSceneImp(curScene, curIntentions)
       case (Failure(ex), curIntentions) => Failure(ex)
     }
   }

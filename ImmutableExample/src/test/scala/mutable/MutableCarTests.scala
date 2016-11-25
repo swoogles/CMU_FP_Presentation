@@ -1,6 +1,6 @@
-package mutable
+package billding.fp.mutable
 
-import functionalpresentation.{Home, Restaurant, School}
+import billding.fp.{Home, Restaurant, School}
 import org.scalatest.{Assertion, FlatSpec}
 
 class MutableCarTests extends FlatSpec {

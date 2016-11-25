@@ -1,6 +1,6 @@
-package mutable
+package billding.fp.mutable
 
-import functionalpresentation.Location
+import billding.fp.Location
 
 trait Movable {
   def move(destination: Location): Unit
