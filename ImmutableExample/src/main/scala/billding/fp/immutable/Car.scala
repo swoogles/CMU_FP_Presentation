@@ -7,7 +7,7 @@ import scala.util.{Failure, Success, Try}
 case class Car(fuel: Int, location: Location)
 case class Person(name: String, location: Location)
 
-case class Scene(joe: Person, sam: Person, car: Car) {
+case class Scene(joe: Person, sam: Person, car: Car, t: Int = 0) {
   def update(intentions: SceneUpdate) : Scene =
     Scenarios.updateScene(this, intentions) match {
       case Success(scene) => scene
@@ -16,6 +16,8 @@ case class Scene(joe: Person, sam: Person, car: Car) {
   def updateTry(intentions: SceneUpdate) : Try[Scene] =
     Scenarios.updateScene(this, intentions)
 }
+
+case class SceneWithFailedMoves(scene: Scene, failedMoves: List[(Scene, SceneUpdate, Throwable)])
 
 sealed trait SceneUpdate {
   val time: Int
@@ -67,7 +69,8 @@ object TravelFunctions extends TravelBehavior {
 
 object Scenarios extends ScenarioActions {
 
-  def updateScene(scene: Scene, update: SceneUpdate) : Try[Scene] =
+  def updateScene(scene: Scene, update: SceneUpdate) : Try[Scene] = {
+    val finalTime = scene.t + update.time
     update match {
       case intentions: Travel =>
         for ((newJoe, joeCarResult) <- TravelFunctions.drive(scene.joe, scene.car, intentions.joe);
@@ -75,13 +78,13 @@ object Scenarios extends ScenarioActions {
              coherentScene <-
                if (joeCarResult != scene.car && samCarResult != scene.car) {
                  if ( joeCarResult == samCarResult )
-                   Success(Scene(newJoe, newSam, samCarResult))
+                   Success(Scene(newJoe, newSam, samCarResult, finalTime))
                  else
                    Failure(new Exception("Final car positions don't agree!"))
                } else if (joeCarResult != scene.car) {
-                   Success(Scene(newJoe, newSam, joeCarResult))
+                   Success(Scene(newJoe, newSam, joeCarResult, finalTime))
                } else {
-                   Success(Scene(newJoe, newSam, samCarResult))
+                   Success(Scene(newJoe, newSam, samCarResult, finalTime))
                }
         ) yield {
           coherentScene
@@ -89,8 +92,9 @@ object Scenarios extends ScenarioActions {
       case Wait(_) => Success(scene)
       case Refuel =>
         val filledCar = scene.car.copy(fuel=100)
-        Success(scene.copy(car = filledCar))
+        Success(scene.copy(car = filledCar, t=finalTime))
     }
+  }
 
   // TODO Find more use cases for this. I'm glad I managed to extract the duplicate code from processScenesType and
   // processScenesTypedCumulative, but it'd really start to shine if I can get 1 or 2 more useful variations.
@@ -112,8 +116,6 @@ object Scenarios extends ScenarioActions {
 
   def processScenesCumulative(scene: Scene, intentions: List[SceneUpdate]) : List[Try[Scene]] =
     intentions.scanLeft(Try(scene))(sceneUpdateCases)
-
-  case class SceneWithFailedMoves(scene: Scene, failedMoves: List[(Scene, SceneUpdate, Throwable)])
 
   def processScenesFaultTolerant(scene: Scene, intentions: SceneUpdate*) : SceneWithFailedMoves =
     processScenesFaultTolerant(scene, intentions.toList)
