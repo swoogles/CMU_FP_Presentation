@@ -18,7 +18,7 @@ class ImmutableCarTestsNonpresentation extends FlatSpec {
     val scene = Scene(JOE, SAM, CAR.copy(location=Restaurant))
     val sceneResult = Scenarios.processScenes(
       scene,
-      SceneUpdate(joe=Home, sam=Restaurant)
+      Travel(joe=Home, sam=Restaurant)
     )
     assert(sceneResult.isFailure)
   }
@@ -26,7 +26,7 @@ class ImmutableCarTestsNonpresentation extends FlatSpec {
   "Driving" should "fail if both people want to travel to different places." in {
     val sceneResult = Scenarios.processScenes(
       SCENE,
-      SceneUpdate(joe=School, sam=Restaurant)
+      Travel(joe=School, sam=Restaurant)
     )
     assert(sceneResult.isFailure)
 
@@ -49,12 +49,12 @@ class ImmutableCarTestsNonpresentation extends FlatSpec {
   "Driving" should "cease when you run out of gas" in {
     val sceneResult = Scenarios.processScenesCumulative(
       SCENE,
-      SceneUpdate(joe=Home, sam=Restaurant),
-      SceneUpdate(joe=Home, sam=School),
-      SceneUpdate(joe=Home, sam=Home),
-      SceneUpdate(joe=Home, sam=School),
-      SceneUpdate(joe=Home, sam=Home),
-      SceneUpdate(joe=School, sam=Home)
+      Travel(joe=Home, sam=Restaurant),
+      Travel(joe=Home, sam=School),
+      Travel(joe=Home, sam=Home),
+      Travel(joe=Home, sam=School),
+      Travel(joe=Home, sam=Home),
+      Travel(joe=School, sam=Home)
     )
 
     pprint.pprintln(sceneResult)
@@ -65,11 +65,11 @@ class ImmutableCarTestsNonpresentation extends FlatSpec {
   "Driving" should "chain" in {
 
     val sceneResult = SCENE
-      .update(SceneUpdate(joe=Home, sam=School))
-      .update(SceneUpdate(joe=Home, sam=Home))
-      .update(SceneUpdate(joe=Home, sam=School))
-      .update(SceneUpdate(joe=Home, sam=Home))
-      .update(SceneUpdate(joe=School, sam=Home))
+      .update(Travel(joe=Home, sam=School))
+      .update(Travel(joe=Home, sam=Home))
+      .update(Travel(joe=Home, sam=School))
+      .update(Travel(joe=Home, sam=Home))
+      .update(Travel(joe=School, sam=Home))
 
     println("Chained result:")
     pprint.pprintln(sceneResult)
@@ -104,12 +104,12 @@ class ImmutableCarTestsNonpresentation extends FlatSpec {
     "Driving" should "cease when you run out of gas, but preserve last state" in {
       val sceneResult = Scenarios.processScenesKeepLastGoodStateScene(
         SCENE,
-        SceneUpdate(joe=Home, sam=Restaurant),
-        SceneUpdate(joe=Home, sam=School),
-        SceneUpdate(joe=Home, sam=Home),
-        SceneUpdate(joe=Home, sam=School),
-        SceneUpdate(joe=Home, sam=Home),
-        SceneUpdate(joe=School, sam=Home)
+        Travel(joe=Home, sam=Restaurant),
+        Travel(joe=Home, sam=School),
+        Travel(joe=Home, sam=Home),
+        Travel(joe=Home, sam=School),
+        Travel(joe=Home, sam=Home),
+        Travel(joe=School, sam=Home)
       )
 
       pprint.pprintln(sceneResult)

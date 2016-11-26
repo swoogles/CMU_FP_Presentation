@@ -16,18 +16,17 @@ case class Scene(joe: Person, sam: Person, car: Car) {
   def updateTry(intentions: SceneUpdate) : Try[Scene] =
     Scenarios.updateScene(this, intentions)
 }
-case class SceneUpdate(joe: Location, sam: Location)
 
-sealed trait BetterSceneUpdate {
+sealed trait SceneUpdate {
   val time: Int
 }
-case object Refuel extends BetterSceneUpdate {
+case object Refuel extends SceneUpdate {
   val time = 1
 }
-case object Wait extends BetterSceneUpdate {
+case object Wait extends SceneUpdate {
   val time = 2
 }
-case class Travel(joe: Location, sam: Location) extends BetterSceneUpdate {
+case class Travel(joe: Location, sam: Location) extends SceneUpdate {
   val time = 5
 }
 
@@ -72,25 +71,7 @@ object TravelFunctions extends TravelBehavior {
 
 object Scenarios extends ScenarioActions {
 
-  def updateScene(scene: Scene, intentions: SceneUpdate) : Try[Scene] =
-    for ((newJoe, joeCarResult) <- TravelFunctions.drive(scene.joe, scene.car, intentions.joe);
-         (newSam, samCarResult) <- TravelFunctions.drive(scene.sam, scene.car, intentions.sam);
-         coherentScene <-
-           if (joeCarResult != scene.car && samCarResult != scene.car) {
-             if ( joeCarResult == samCarResult )
-               Success(Scene(newJoe, newSam, samCarResult))
-             else
-               Failure(new Exception("Final car positions don't agree!"))
-           } else if (joeCarResult != scene.car) {
-               Success(Scene(newJoe, newSam, joeCarResult))
-           } else {
-               Success(Scene(newJoe, newSam, samCarResult))
-           }
-    ) yield {
-      coherentScene
-    }
-
-  def updateSceneImp(scene: Scene, update: BetterSceneUpdate) : Try[Scene] =
+  def updateScene(scene: Scene, update: SceneUpdate) : Try[Scene] =
     update match {
       case intentions: Travel =>
         for ((newJoe, joeCarResult) <- TravelFunctions.drive(scene.joe, scene.car, intentions.joe);
@@ -120,13 +101,6 @@ object Scenarios extends ScenarioActions {
   private val sceneUpdateCases = { (curScene: Try[Scene], update: SceneUpdate) =>
     (curScene, update) match {
       case (Success(curScene: Scene), curIntentions) => updateScene(curScene, curIntentions)
-      case (Failure(ex), curIntentions) => Failure(ex)
-    }
-  }
-
-  private val sceneUpdateCasesImp = { (curScene: Try[Scene], update: BetterSceneUpdate) =>
-    (curScene, update) match {
-      case (Success(curScene: Scene), curIntentions) => updateSceneImp(curScene, curIntentions)
       case (Failure(ex), curIntentions) => Failure(ex)
     }
   }
