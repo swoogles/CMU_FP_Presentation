@@ -23,12 +23,8 @@ sealed trait SceneUpdate {
 case object Refuel extends SceneUpdate {
   val time = 1
 }
-case object Wait extends SceneUpdate {
-  val time = 2
-}
-case class Travel(joe: Location, sam: Location) extends SceneUpdate {
-  val time = 5
-}
+case class Wait(time: Int) extends SceneUpdate
+case class Travel(joe: Location, sam: Location, time: Int = 5) extends SceneUpdate
 
 trait TravelBehavior {
   def drive(person: Person, car: Car, destination: Location): Try[(Person, Car)]
@@ -90,7 +86,7 @@ object Scenarios extends ScenarioActions {
         ) yield {
           coherentScene
         }
-      case Wait => Success(scene)
+      case Wait(_) => Success(scene)
       case Refuel =>
         val filledCar = scene.car.copy(fuel=100)
         Success(scene.copy(car = filledCar))
