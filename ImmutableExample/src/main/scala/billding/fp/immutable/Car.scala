@@ -89,7 +89,7 @@ object Scenarios extends ScenarioActions {
         ) yield {
           coherentScene
         }
-      case Wait(_) => Success(scene)
+      case Wait(dt) => Success(scene.copy(t=finalTime))
       case Refuel =>
         val filledCar = scene.car.copy(fuel=100)
         Success(scene.copy(car = filledCar, t=finalTime))
